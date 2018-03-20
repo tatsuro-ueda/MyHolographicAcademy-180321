@@ -291,7 +291,7 @@ namespace HoloToolkit.Unity
                             {
                                 Light clonedLight = Instantiate(DebugPointLight, closestHit.point, Quaternion.identity) as Light;
                                 clonedLight.color = Color.red;
-                                Destroy(clonedLight, 1.0f);
+                                DestroyObject(clonedLight, 1.0f);
                             }
 #if UNITY_EDITOR
                             DebugDrawLine(DebugDrawLines, cameraPosition, targetCoord, Color.red);

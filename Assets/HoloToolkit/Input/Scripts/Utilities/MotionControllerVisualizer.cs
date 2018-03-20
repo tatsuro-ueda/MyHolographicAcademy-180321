@@ -10,10 +10,9 @@ using System.Runtime.InteropServices;
 #endif
 
 #if UNITY_WSA && UNITY_2017_2_OR_NEWER
+using GLTF;
 using System.Collections;
-using System.IO;
 using UnityEngine.XR.WSA.Input;
-using UnityGLTF;
 
 #if !UNITY_EDITOR
 using Windows.Foundation;
@@ -52,7 +51,6 @@ namespace HoloToolkit.Unity.InputModule
         [SerializeField]
         protected UnityEngine.Material GLTFMaterial;
 
-#if UNITY_WSA && UNITY_2017_2_OR_NEWER
         // This will be used to keep track of our controllers, indexed by their unique source ID.
         private Dictionary<string, MotionControllerInfo> controllerDictionary = new Dictionary<string, MotionControllerInfo>(0);
         private List<string> loadingControllers = new List<string>();
@@ -62,7 +60,6 @@ namespace HoloToolkit.Unity.InputModule
 
         public event Action<MotionControllerInfo> OnControllerModelLoaded;
         public event Action<MotionControllerInfo> OnControllerModelUnloaded;
-#endif
 
 #if UNITY_EDITOR_WIN
         [DllImport("MotionControllerModel")]
@@ -174,7 +171,6 @@ namespace HoloToolkit.Unity.InputModule
             }
 #endif
         }
-
         private bool ValidRotation(Quaternion newRotation)
         {
             return !float.IsNaN(newRotation.x) && !float.IsNaN(newRotation.y) && !float.IsNaN(newRotation.z) && !float.IsNaN(newRotation.w) &&
@@ -186,7 +182,6 @@ namespace HoloToolkit.Unity.InputModule
             return !float.IsNaN(newPosition.x) && !float.IsNaN(newPosition.y) && !float.IsNaN(newPosition.z) &&
                 !float.IsInfinity(newPosition.x) && !float.IsInfinity(newPosition.y) && !float.IsInfinity(newPosition.z);
         }
-
 #if UNITY_WSA && UNITY_2017_2_OR_NEWER
         private void InteractionManager_InteractionSourceDetected(InteractionSourceDetectedEventArgs obj)
         {
@@ -366,12 +361,12 @@ namespace HoloToolkit.Unity.InputModule
 #endif
 
             controllerModelGameObject = new GameObject { name = "glTFController" };
-            GLTFComponent gltfScript = controllerModelGameObject.AddComponent<GLTFComponent>();
-            gltfScript.GLTFConstant = gltfScript.GLTFStandard = gltfScript.GLTFStandardSpecular = GLTFMaterial.shader;
-            gltfScript.UseStream = true;
-            gltfScript.GLTFStream = new MemoryStream(fileBytes);
+            GLTFComponentStreamingAssets gltfScript = controllerModelGameObject.AddComponent<GLTFComponentStreamingAssets>();
+            gltfScript.ColorMaterial = GLTFMaterial;
+            gltfScript.NoColorMaterial = GLTFMaterial;
+            gltfScript.GLTFData = fileBytes;
 
-            yield return gltfScript.WaitForModelLoad();
+            yield return gltfScript.LoadModel();
 
             FinishControllerSetup(controllerModelGameObject, source.handedness, GenerateKey(source));
         }

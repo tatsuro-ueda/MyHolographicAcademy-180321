@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using UnityEngine;
+
 #if UNITY_WSA && UNITY_2017_2_OR_NEWER
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.WSA;
 #endif
@@ -16,11 +17,11 @@ namespace HoloToolkit.Unity.Boundary
     /// </summary>
     public class BoundaryManager : Singleton<BoundaryManager>
     {
-#if UNITY_WSA && UNITY_2017_2_OR_NEWER
         [Tooltip("Quad prefab to display as the floor.")]
-        public GameObject FloorQuad = null;
-        private GameObject floorQuadInstance = null;
+        public GameObject FloorQuad;
+        private GameObject floorQuadInstance;
 
+#if UNITY_WSA && UNITY_2017_2_OR_NEWER
         [SerializeField]
         [Tooltip("Approximate max Y height of your space.")]
         private float boundaryHeight = 10f;
@@ -37,6 +38,8 @@ namespace HoloToolkit.Unity.Boundary
         // Defaulting coordinate system to Stationary for transparent headsets, like HoloLens.
         // This puts the origin (0, 0, 0) at the first place where the user started the application.
         //private TrackingSpaceType transparentTrackingSpaceType = TrackingSpaceType.Stationary;
+#endif
+
         // Testing in the editor found that this moved the floor out of the way enough, and it is only
         // used in the case where a headset isn't attached. Otherwise, the floor is positioned like normal.
         private readonly Vector3 floorPositionInEditor = new Vector3(0f, -3f, 0f);
@@ -70,7 +73,6 @@ namespace HoloToolkit.Unity.Boundary
                 }
             }
         }
-#endif
 
         protected override void Awake()
         {
@@ -98,6 +100,7 @@ namespace HoloToolkit.Unity.Boundary
 
             // Create a volume out of the specified user boundary.
             CalculateBoundaryVolume();
+#endif
         }
 
         private void SetFloorRendering()
@@ -106,12 +109,11 @@ namespace HoloToolkit.Unity.Boundary
             {
                 floorQuadInstance.SetActive(renderFloor);
             }
-#endif
         }
 
         private void SetBoundaryRendering()
         {
-#if UNITY_WSA &&  UNITY_2017_2_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
             // TODO: BUG: Unity: configured bool always returns false in 2017.2.0p2-MRTP5.
             if (UnityEngine.Experimental.XR.Boundary.configured)
             {
@@ -188,10 +190,6 @@ namespace HoloToolkit.Unity.Boundary
                         boundaryBounds.Encapsulate(boundaryGeo);
                     }
                 }
-            }
-            else
-            {
-                Debug.Log("TryGetGeometry always returns false.");
             }
 
             // Ensuring that we set height of the bounds volume to be say 10 feet tall.

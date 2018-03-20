@@ -65,7 +65,7 @@ namespace HoloToolkit.Unity.InputModule
         /// </summary>
         public Vector3 GazeOrigin
         {
-            get { return Rays[0].Origin; }
+            get { return Rays[0].origin; }
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace HoloToolkit.Unity.InputModule
         /// </summary>
         public Vector3 GazeNormal
         {
-            get { return Rays[0].Direction; }
+            get { return Rays[0].direction; }
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace HoloToolkit.Unity.InputModule
 
             if (focusDetails.Object != null)
             {
-                lastHitDistance = (focusDetails.Point - Rays[0].Origin).magnitude;
+                lastHitDistance = (focusDetails.Point - Rays[0].origin).magnitude;
                 UpdateHitPosition();
                 HitNormal = focusDetails.Normal;
             }
@@ -252,7 +252,7 @@ namespace HoloToolkit.Unity.InputModule
 
         private void UpdateHitPosition()
         {
-            HitPosition = (Rays[0].Origin + (lastHitDistance * Rays[0].Direction));
+            HitPosition = (Rays[0].origin + (lastHitDistance * Rays[0].direction));
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿//
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
-
+//
 using HoloToolkit.Unity;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,9 +17,7 @@ namespace HoloToolkit.Unity.Buttons
     /// </summary>
     public class ButtonIconProfileTexture : ButtonIconProfile
     {
-#if UNITY_EDITOR
         private static float textureSize = 50f;
-#endif
 
         [Header("Navigation icons")]
         public Texture2D GlobalNavButton;

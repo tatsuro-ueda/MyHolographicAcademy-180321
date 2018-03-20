@@ -12,7 +12,7 @@ namespace HoloToolkit.UI.Keyboard
 		/// The highlight image to turn on and off.
 		/// </summary>
 		[SerializeField]
-		private Image m_Highlight = null;
+		private Image m_Highlight;
 
 		/// <summary>
 		/// The keyboard to check for caps locks

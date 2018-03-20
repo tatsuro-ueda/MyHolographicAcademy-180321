@@ -1,6 +1,5 @@
 ## [Utilities]()
-Useful components that make development or debugging easier. 
-They are also components which don't rely one a particular device feature to work and are generic.
+Useful common concepts that you can leverage in your application.
 
 ### [Prefabs](Prefabs)
 ---

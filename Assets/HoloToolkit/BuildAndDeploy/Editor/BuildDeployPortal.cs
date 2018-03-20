@@ -1,15 +1,16 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿//
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
+//
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
 namespace HoloToolkit.Unity
@@ -17,9 +18,22 @@ namespace HoloToolkit.Unity
     /// <summary>
     /// Function used to communicate with the device through the REST API
     /// </summary>
-    public static class BuildDeployPortal
+    public class BuildDeployPortal
     {
-        private enum AppInstallStatus
+        // Consts
+        public const float TimeOut = 6.0f;
+        public const int TimeoutMS = (int)(TimeOut * 1000.0f);
+        public const float MaxWaitTime = 20.0f;
+
+        public static readonly string API_ProcessQuery = @"http://{0}/api/resourcemanager/processes";
+        public static readonly string API_PackagesQuery = @"http://{0}/api/appx/packagemanager/packages";
+        public static readonly string API_InstallQuery = @"http://{0}/api/app/packagemanager/package";
+        public static readonly string API_InstallStatusQuery = @"http://{0}/api/app/packagemanager/state";
+        public static readonly string API_AppQuery = @"http://{0}/api/taskmanager/app";
+        public static readonly string API_FileQuery = @"http://{0}/api/filesystem/apps/file";
+
+        // Enums
+        public enum AppInstallStatus
         {
             Invalid,
             Installing,
@@ -27,339 +41,101 @@ namespace HoloToolkit.Unity
             InstallFail
         }
 
-        private const float TimeOut = 10.0f;
-        private const float MaxWaitTime = 20.0f;
-
-        // Device Portal API Resources
-        // https://docs.microsoft.com/en-us/windows/uwp/debug-test-perf/device-portal-api-hololens#holographic-os
-        // https://docs.microsoft.com/en-us/windows/uwp/debug-test-perf/device-portal-api-core
-        private static readonly string API_GetMachineNameQuery = @"{0}/api/os/machinename";
-        private static readonly string API_ProcessQuery = @"{0}/api/resourcemanager/processes";
-        private static readonly string API_PackagesQuery = @"{0}/api/appx/packagemanager/packages";
-        private static readonly string API_InstallQuery = @"{0}/api/app/packagemanager/package";
-        private static readonly string API_InstallStatusQuery = @"{0}/api/app/packagemanager/state";
-        private static readonly string API_AppQuery = @"{0}/api/taskmanager/app";
-        private static readonly string API_FileQuery = @"{0}/api/filesystem/apps/file?knownfolderid=LocalAppData&filename=UnityPlayer.log&packagefullname={1}&path=%5C%5CTempState";
-        private static readonly string API_IpConfigQuery = @"{0}/api/networking/ipconfig";
-
-        /// <summary>
-        /// Gets the Basic auth header.
-        /// <remarks>If you're using SSL and making HTTPS requests you must also specify if the request is of GET type or not, 
-        /// so we know if we should append the "auto-" prefix to bypass CSRF.</remarks>
-        /// </summary>
-        /// <param name="connectionInfo">target device connection info.</param>
-        /// <param name="isGetRequest">If the request you're attempting to make is a GET type</param>
-        /// <returns></returns>
-        private static string GetBasicAuthHeader(ConnectInfo connectionInfo, bool isGetRequest = false)
+        // Classes & Structs
+        public struct ConnectInfo
         {
-            var auth = string.Format("{0}{1}:{2}", BuildDeployPrefs.UseSSL && !isGetRequest ? "auto-" : "", connectionInfo.User, connectionInfo.Password);
-            auth = Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(auth));
-            return string.Format("Basic {0}", auth);
-        }
-
-        /// <summary>
-        /// Send a Unity Web Request to GET.
-        /// </summary>
-        /// <param name="query">Full Query to GET</param>
-        /// <param name="auth">Authorization header</param>
-        /// <param name="showProgressDialog">Show the progress dialog.</param>
-        /// <returns>Response string.</returns>
-        private static string WebRequestGet(string query, string auth, bool showProgressDialog = true)
-        {
-            try
+            public ConnectInfo(string ip, string user, string password)
             {
-                using (var webRequest = UnityWebRequest.Get(query))
-                {
-                    webRequest.SetRequestHeader("Authorization", auth);
-                    webRequest.timeout = (int)TimeOut;
-
-#if UNITY_2017_2_OR_NEWER
-                    webRequest.SendWebRequest();
-#else
-                    webRequest.Send();
-#endif
-
-                    while (!webRequest.isDone)
-                    {
-                        if (webRequest.downloadProgress > -1 && showProgressDialog)
-                        {
-                            EditorUtility.DisplayProgressBar("Connecting to Device Portal",
-                                                             "Progress...", webRequest.downloadProgress);
-                        }
-                    }
-
-                    if (showProgressDialog)
-                    {
-                        EditorUtility.ClearProgressBar();
-                    }
-
-                    if (
-#if UNITY_2017_2_OR_NEWER
-                        webRequest.isNetworkError || webRequest.isHttpError && 
-#else
-                        webRequest.isError &&
-#endif
-                        webRequest.responseCode != 401)
-                    {
-                        string response = string.Empty;
-                        var responseHeaders = webRequest.GetResponseHeaders();
-                        if (responseHeaders != null)
-                        {
-                            response = responseHeaders.Aggregate(string.Empty, (current, header) => string.Format("{0}{1}: {2}\n", current, header.Key, header.Value));
-                        }
-
-                        Debug.LogErrorFormat("Network Error: {0}\n{1}", webRequest.error, response);
-                        return string.Empty;
-                    }
-
-                    switch (webRequest.responseCode)
-                    {
-                        case 200:
-                        case 204:
-                            return webRequest.downloadHandler.text;
-                        case 401:
-                            Debug.LogError("Unauthorized: Access is denied due to invalid credentials.");
-                            break;
-                        default:
-                            Debug.LogError(webRequest.responseCode);
-                            break;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
+                IP = ip;
+                User = user;
+                Password = password;
             }
 
-            return string.Empty;
+            public string IP;
+            public string User;
+            public string Password;
+        }
+        [Serializable]
+        public class AppDetails
+        {
+            public string Name;
+            public string PackageFamilyName;
+            public string PackageFullName;
+            public int PackageOrigin;
+            public string PackageRelativeId;
+            public string Publisher;
+        }
+        [Serializable]
+        public class AppList
+        {
+            public AppDetails[] InstalledPackages;
+        }
+        [Serializable]
+        public class ProcessDesc
+        {
+            public float CPUUsage;
+            public string ImageName;
+            public float PageFileUsage;
+            public int PrivateWorkingSet;
+            public int ProcessId;
+            public int SessionId;
+            public string UserName;
+            public int VirtualSize;
+            public int WorkingSetSize;
         }
 
-        /// <summary>
-        /// Send a Unity Web Request to POST.
-        /// </summary>
-        /// <param name="query">Full Query to GET</param>
-        /// <param name="postData">Post Data</param>
-        /// <param name="auth">Authorization Header</param>
-        /// <param name="showDialog">Show the progress dialog.</param>
-        /// <returns>Response string.</returns>
-        private static string WebRequestPost(string query, WWWForm postData, string auth, bool showDialog = true)
+        [Serializable]
+        public class ProcessList
         {
-            try
+            public ProcessDesc[] Processes;
+        }
+
+        [Serializable]
+        public class InstallStatus
+        {
+            public int Code;
+            public string CodeText;
+            public string Reason;
+            public bool Success;
+        }
+
+        [Serializable]
+        public class Response
+        {
+            public string Reason;
+        }
+
+        private class TimeoutWebClient : WebClient
+        {
+            protected override WebRequest GetWebRequest(Uri uri)
             {
-                using (var webRequest = UnityWebRequest.Post(query, postData))
-                {
-                    webRequest.SetRequestHeader("Authorization", auth);
-                    webRequest.timeout = (int)TimeOut;
+                WebRequest lWebRequest = base.GetWebRequest(uri);
 
-                    // HACK: Workaround for extra quotes around boundary.
-                    string contentType = webRequest.GetRequestHeader("Content-Type");
-                    if (contentType != null)
-                    {
-                        contentType = contentType.Replace("\"", "");
-                        webRequest.SetRequestHeader("Content-Type", contentType);
-                    }
+                if (lWebRequest == null) { return null; }
 
-#if UNITY_2017_2_OR_NEWER
-                    webRequest.SendWebRequest();
-#else
-                    webRequest.Send();
-#endif
+                lWebRequest.Timeout = TimeoutMS;
+                ((HttpWebRequest)lWebRequest).ReadWriteTimeout = TimeoutMS;
 
-                    while (!webRequest.isDone)
-                    {
-                        if (webRequest.uploadProgress > -1 && showDialog)
-                        {
-                            EditorUtility.DisplayProgressBar("Connecting to Device Portal",
-                                                             "Uploading...", webRequest.uploadProgress);
-                        }
-                        else if (webRequest.downloadProgress > -1 && showDialog)
-                        {
-                            EditorUtility.DisplayProgressBar("Connecting to Device Portal",
-                                                             "Progress...", webRequest.downloadProgress);
-                        }
-                    }
-
-                    EditorUtility.ClearProgressBar();
-
-                    if (
-#if UNITY_2017_2_OR_NEWER
-                        webRequest.isNetworkError || webRequest.isHttpError && 
-#else
-                        webRequest.isError &&
-#endif
-                        webRequest.responseCode != 401)
-                    {
-                        string response = string.Empty;
-                        var responseHeaders = webRequest.GetResponseHeaders();
-                        if (responseHeaders != null)
-                        {
-                            response = responseHeaders.Aggregate(string.Empty, (current, header) => string.Format("{0}{1}: {2}\n", current, header.Key, header.Value));
-                        }
-
-                        Debug.LogErrorFormat("Network Error: {0}\n{1}", webRequest.error, response);
-                        return string.Empty;
-                    }
-
-                    switch (webRequest.responseCode)
-                    {
-                        case 200:
-                        case 202:
-                            return webRequest.downloadHandler.text;
-                        case 401:
-                            Debug.LogError("Unauthorized: Access is denied due to invalid credentials.");
-                            break;
-                        default:
-                            Debug.LogError(webRequest.responseCode);
-                            break;
-                    }
-                }
+                return lWebRequest;
             }
-            catch (Exception e)
+        }
+
+        // Functions
+        public static bool IsAppInstalled(string packageFamilyName, ConnectInfo connectInfo)
+        {
+            // Look at the device for a matching app name (if not there, then not installed)
+            return (QueryAppDetails(packageFamilyName, connectInfo) != null);
+        }
+
+        public static bool IsAppRunning(string appName, ConnectInfo connectInfo)
+        {
+            using (var client = new TimeoutWebClient())
             {
-                Debug.LogException(e);
-            }
+                client.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+                string query = string.Format(API_ProcessQuery, connectInfo.IP);
+                string downloadString = client.DownloadString(query);
 
-            return string.Empty;
-        }
-
-        /// <summary>
-        /// Send a Unity Web Request to DELETE
-        /// </summary>
-        /// <param name="query">Full Query.</param>
-        /// <param name="auth">Authorization Header</param>
-        /// <param name="showDialog">Show to progress dialog</param>
-        /// <returns>Successful or not.</returns>
-        private static bool WebRequestDelete(string query, string auth, bool showDialog = true)
-        {
-            try
-            {
-                using (var webRequest = UnityWebRequest.Delete(query))
-                {
-                    webRequest.SetRequestHeader("Authorization", auth);
-                    webRequest.timeout = (int)TimeOut;
-
-#if UNITY_2017_2_OR_NEWER
-                    webRequest.SendWebRequest();
-#else
-                    webRequest.Send();
-#endif
-
-                    while (!webRequest.isDone)
-                    {
-                        if (showDialog && webRequest.downloadProgress > -1)
-                        {
-                            EditorUtility.DisplayProgressBar("Connecting to Device Portal",
-                                                             "Progress...", webRequest.downloadProgress);
-                        }
-                    }
-
-                    EditorUtility.ClearProgressBar();
-
-                    if (
-#if UNITY_2017_2_OR_NEWER
-                        webRequest.isNetworkError || webRequest.isHttpError && 
-#else
-                        webRequest.isError &&
-#endif
-                        webRequest.responseCode != 401)
-                    {
-                        string response = string.Empty;
-                        var responseHeaders = webRequest.GetResponseHeaders();
-                        if (responseHeaders != null)
-                        {
-                            response = responseHeaders.Aggregate(string.Empty, (current, header) => string.Format("{0}{1}: {2}\n", current, header.Key, header.Value));
-                        }
-
-                        Debug.LogErrorFormat("Network Error: {0}\n{1}", webRequest.error, response);
-                        return false;
-                    }
-
-                    switch (webRequest.responseCode)
-                    {
-                        case 200:
-                            return true;
-                        case 401:
-                            Debug.LogError("Unauthorized: Access is denied due to invalid credentials.");
-                            break;
-                        default:
-                            Debug.LogError(webRequest.responseCode);
-                            break;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Opens the Device Portal for the target device.
-        /// </summary>
-        /// <param name="targetDevice"></param>
-        public static void OpenWebPortal(ConnectInfo targetDevice)
-        {
-            //TODO: Figure out how to pass username and password to browser?
-            Process.Start(FinalizeUrl(targetDevice.IP));
-        }
-
-        /// <summary>
-        /// Gets the <see cref="MachineName"/> of the target device.
-        /// </summary>
-        /// <param name="targetDevice"></param>
-        /// <returns><see cref="MachineName"/></returns>
-        public static MachineName GetMachineName(ConnectInfo targetDevice)
-        {
-            MachineName machineName = null;
-            string query = string.Format(API_GetMachineNameQuery, FinalizeUrl(targetDevice.IP));
-            string response = WebRequestGet(query, GetBasicAuthHeader(targetDevice, true), false);
-
-            if (!string.IsNullOrEmpty(response))
-            {
-                machineName = JsonUtility.FromJson<MachineName>(response);
-            }
-
-            return machineName;
-        }
-
-        [Obsolete("Use IsAppInstalled(string packageFamilyName, ConnectInfo targetDevice)")]
-        public static bool IsAppInstalled(string packageFamilyName, string targetIp)
-        {
-            return QueryAppDetails(packageFamilyName, new ConnectInfo(targetIp, BuildDeployPrefs.DeviceUser, BuildDeployPrefs.DevicePassword)) != null;
-        }
-
-        /// <summary>
-        /// Determines if the target application is currently running on the target device.
-        /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <param name="targetDevice"></param>
-        /// <returns>True, if application is currently installed on device.</returns>
-        public static bool IsAppInstalled(string packageFamilyName, ConnectInfo targetDevice)
-        {
-            return QueryAppDetails(packageFamilyName, targetDevice) != null;
-        }
-
-        [Obsolete("IsAppRunning(string appName, ConnectInfo targetDevice)")]
-        public static bool IsAppRunning(string appName, string targetDevice)
-        {
-            return IsAppRunning(appName, new ConnectInfo(targetDevice, BuildDeployPrefs.DeviceUser, BuildDeployPrefs.DevicePassword));
-        }
-
-        /// <summary>
-        /// Determines if the target application is running on the target device.
-        /// </summary>
-        /// <param name="appName"></param>
-        /// <param name="targetDevice"></param>
-        /// <returns>True, if the application is running.</returns>
-        public static bool IsAppRunning(string appName, ConnectInfo targetDevice)
-        {
-            string response = WebRequestGet(string.Format(API_ProcessQuery, FinalizeUrl(targetDevice.IP)), GetBasicAuthHeader(targetDevice, true), false);
-
-            if (!string.IsNullOrEmpty(response))
-            {
-                var processList = JsonUtility.FromJson<ProcessList>(response);
+                var processList = JsonUtility.FromJson<ProcessList>(downloadString);
                 for (int i = 0; i < processList.Processes.Length; ++i)
                 {
                     string processName = processList.Processes[i].ImageName;
@@ -374,19 +150,41 @@ namespace HoloToolkit.Unity
             return false;
         }
 
-        /// <summary>
-        /// Returns the <see cref="AppDetails"/> of the target application from the target device.
-        /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <param name="targetDevice"></param>
-        /// <returns>null if application is not currently installed on the target device.</returns>
-        private static AppDetails QueryAppDetails(string packageFamilyName, ConnectInfo targetDevice)
+        public static AppInstallStatus GetInstallStatus(ConnectInfo connectInfo)
         {
-            string response = WebRequestGet(string.Format(API_PackagesQuery, FinalizeUrl(targetDevice.IP)), GetBasicAuthHeader(targetDevice, true), false);
-
-            if (!string.IsNullOrEmpty(response))
+            using (var client = new TimeoutWebClient())
             {
-                var appList = JsonUtility.FromJson<AppList>(response);
+                client.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+                string query = string.Format(API_InstallStatusQuery, connectInfo.IP);
+                string statusJSON = client.DownloadString(query);
+                var status = JsonUtility.FromJson<InstallStatus>(statusJSON);
+
+                if (status == null)
+                {
+                    return AppInstallStatus.Installing;
+                }
+
+                Debug.LogFormat("Install Status: {0}|{1}|{2}|{3}", status.Code, status.CodeText, status.Reason, status.Success);
+
+                if (status.Success == false)
+                {
+                    Debug.LogError(status.Reason + "(" + status.CodeText + ")");
+                    return AppInstallStatus.InstallFail;
+                }
+
+                return AppInstallStatus.InstallSuccess;
+            }
+        }
+
+        public static AppDetails QueryAppDetails(string packageFamilyName, ConnectInfo connectInfo)
+        {
+            using (var client = new TimeoutWebClient())
+            {
+                client.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+                string query = string.Format(API_PackagesQuery, connectInfo.IP);
+                string appListJSON = client.DownloadString(query);
+
+                var appList = JsonUtility.FromJson<AppList>(appListJSON);
                 for (int i = 0; i < appList.InstalledPackages.Length; ++i)
                 {
                     string thisAppName = appList.InstalledPackages[i].PackageFamilyName;
@@ -400,17 +198,8 @@ namespace HoloToolkit.Unity
             return null;
         }
 
-        /// <summary>
-        /// Installs the target application on the target device.
-        /// </summary>
-        /// <param name="appFullPath"></param>
-        /// <param name="targetDevice"></param>
-        /// <param name="waitForDone">Should the thread wait until installation is complete?</param>
-        /// <returns>True, if Installation was a success.</returns>
-        public static bool InstallApp(string appFullPath, ConnectInfo targetDevice, bool waitForDone = true)
+        public static bool InstallApp(string appFullPath, ConnectInfo connectInfo, bool waitForDone = true)
         {
-            bool success = false;
-
             try
             {
                 // Calculate the cert and dependency paths
@@ -423,301 +212,242 @@ namespace HoloToolkit.Unity
                 var form = new WWWForm();
 
                 // APPX file
-                Debug.Assert(appFullPath != null);
-                using (var stream = new FileStream(appFullPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        form.AddBinaryData(fileName, reader.ReadBytes((int)reader.BaseStream.Length), fileName);
-                    }
-                }
+                var stream = new FileStream(appFullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var reader = new BinaryReader(stream);
+                form.AddBinaryData(fileName, reader.ReadBytes((int)reader.BaseStream.Length), fileName);
+                stream.Close();
 
                 // CERT file
-                Debug.Assert(certFullPath != null);
-                using (var stream = new FileStream(certFullPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    using (var reader = new BinaryReader(stream))
-                    {
-                        form.AddBinaryData(certName, reader.ReadBytes((int)reader.BaseStream.Length), certName);
-                    }
-                }
+                stream = new FileStream(certFullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                reader = new BinaryReader(stream);
+                form.AddBinaryData(certName, reader.ReadBytes((int)reader.BaseStream.Length), certName);
+                stream.Close();
 
                 // Dependencies
-                FileInfo[] depFiles = new DirectoryInfo(depPath).GetFiles();
+                FileInfo[] depFiles = (new DirectoryInfo(depPath)).GetFiles();
                 foreach (FileInfo dep in depFiles)
                 {
-                    using (var stream = new FileStream(dep.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        using (var reader = new BinaryReader(stream))
-                        {
-                            string depFilename = Path.GetFileName(dep.FullName);
-                            form.AddBinaryData(depFilename, reader.ReadBytes((int)reader.BaseStream.Length), depFilename);
-                        }
-                    }
+                    stream = new FileStream(dep.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    reader = new BinaryReader(stream);
+                    string depFilename = Path.GetFileName(dep.FullName);
+                    form.AddBinaryData(depFilename, reader.ReadBytes((int)reader.BaseStream.Length), depFilename);
+                    stream.Close();
+                }
+
+                // Credentials
+                Dictionary<string, string> headers = form.headers;
+                headers["Authorization"] = "Basic " + EncodeTo64(connectInfo.User + ":" + connectInfo.Password);
+
+                // Unity places an extra quote in the content-type boundary parameter that the device portal doesn't care for, remove it
+                if (headers.ContainsKey("Content-Type"))
+                {
+                    headers["Content-Type"] = headers["Content-Type"].Replace("\"", "");
                 }
 
                 // Query
-                string query = string.Format(API_InstallQuery, FinalizeUrl(targetDevice.IP));
+                string query = string.Format(API_InstallQuery, connectInfo.IP);
                 query += "?package=" + WWW.EscapeURL(fileName);
 
-                var response = WebRequestPost(query, form, GetBasicAuthHeader(targetDevice));
+                var www = new WWW(query, form.data, headers);
+                DateTime queryStartTime = DateTime.Now;
 
-                if (string.IsNullOrEmpty(response))
+                while (!www.isDone && (DateTime.Now - queryStartTime).TotalSeconds < TimeOut)
                 {
-                    Debug.LogErrorFormat("Failed to install {0} on {1}.\n", fileName, targetDevice.MachineName);
-                    return false;
+                    Thread.Sleep(10);
+                }
+
+                // Give it a short time before checking
+                Thread.Sleep(250);
+
+                // Report
+                if (www.isDone)
+                {
+                    if (!string.IsNullOrEmpty(www.error))
+                    {
+                        Debug.LogError(www.error);
+                    }
+                    else if (!string.IsNullOrEmpty(www.text))
+                    {
+                        Debug.Log(JsonUtility.FromJson<Response>(www.text).Reason);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Completed with null response string");
+                    }
                 }
 
                 // Wait for done (if requested)
                 DateTime waitStartTime = DateTime.Now;
                 while (waitForDone && (DateTime.Now - waitStartTime).TotalSeconds < MaxWaitTime)
                 {
-                    EditorUtility.DisplayProgressBar("Connecting to Device Portal", "Installing...", (float)((DateTime.Now - waitStartTime).TotalSeconds / MaxWaitTime));
-                    AppInstallStatus status = GetInstallStatus(targetDevice);
-
+                    AppInstallStatus status = GetInstallStatus(connectInfo);
                     if (status == AppInstallStatus.InstallSuccess)
                     {
-                        Debug.LogFormat("Successfully installed {0} on {1}.", fileName, targetDevice.MachineName);
-                        success = true;
+                        Debug.Log("Install Successful!");
                         break;
                     }
-
                     if (status == AppInstallStatus.InstallFail)
                     {
-                        Debug.LogErrorFormat("Failed to install {0} on {1}.\n", fileName, targetDevice.MachineName);
+                        Debug.LogError("Install Failed!");
                         break;
                     }
 
                     // Wait a bit and we'll ask again
                     Thread.Sleep(1000);
                 }
-
-                EditorUtility.ClearProgressBar();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.LogException(e);
-                success = false;
-            }
-
-            return success;
-        }
-
-        private static AppInstallStatus GetInstallStatus(ConnectInfo targetDevice)
-        {
-            string response = WebRequestGet(string.Format(API_InstallStatusQuery, FinalizeUrl(targetDevice.IP)), GetBasicAuthHeader(targetDevice, true), false);
-
-            if (!string.IsNullOrEmpty(response))
-            {
-                var status = JsonUtility.FromJson<InstallStatus>(response);
-
-                if (status == null)
-                {
-                    return AppInstallStatus.Installing;
-                }
-
-                if (status.Success)
-                {
-                    return AppInstallStatus.InstallSuccess;
-                }
-
-                Debug.LogError(status.Reason + "(" + status.CodeText + ")");
-            }
-            else
-            {
-                return AppInstallStatus.Installing;
-            }
-
-            return AppInstallStatus.InstallFail;
-        }
-
-        [Obsolete("Use UninstallApp(string packageFamilyName, ConnectInfo targetDevice)")]
-        public static bool UninstallApp(string packageFamilyName, string targetIp)
-        {
-            return UninstallApp(packageFamilyName, new ConnectInfo(targetIp, BuildDeployPrefs.DeviceUser, BuildDeployPrefs.DevicePassword));
-        }
-
-        /// <summary>
-        /// Uninstalls the target application on the target device.
-        /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <param name="targetDevice"></param>
-        /// <param name="showDialog"></param>
-        /// <returns>True, if uninstall was a success.</returns>
-        public static bool UninstallApp(string packageFamilyName, ConnectInfo targetDevice, bool showDialog = true)
-        {
-            AppDetails appDetails = QueryAppDetails(packageFamilyName, targetDevice);
-            if (appDetails == null)
-            {
-                Debug.Log(string.Format("Application '{0}' not found", packageFamilyName));
+                Debug.LogError(ex.ToString());
                 return false;
             }
 
-            string query = string.Format("{0}?package={1}",
-                string.Format(API_InstallQuery, FinalizeUrl(targetDevice.IP)),
-                WWW.EscapeURL(appDetails.PackageFullName));
-
-            bool success = WebRequestDelete(query, GetBasicAuthHeader(targetDevice), showDialog);
-            MachineName targetMachine = GetMachineName(targetDevice);
-
-            if (success)
-            {
-                Debug.LogFormat("Successfully uninstalled {0} on {1}.", packageFamilyName, targetMachine.ComputerName);
-            }
-            else
-            {
-                Debug.LogErrorFormat("Failed to uninstall {0} on {1}", packageFamilyName, targetMachine.ComputerName);
-            }
-
-            return success;
+            return true;
         }
 
-        /// <summary>
-        /// Launches the target application on the target device.
-        /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <param name="targetDevice"></param>
-        /// <param name="showDialog"></param>
-        /// <returns>True, if application was successfully launched and is currently running on the target device.</returns>
-        public static bool LaunchApp(string packageFamilyName, ConnectInfo targetDevice, bool showDialog = true)
+        public static bool UninstallApp(string packageFamilyName, ConnectInfo connectInfo)
+        {
+            try
+            {
+                // Find the app description
+                AppDetails appDetails = QueryAppDetails(packageFamilyName, connectInfo);
+                if (appDetails == null)
+                {
+                    Debug.LogError(string.Format("Application '{0}' not found", packageFamilyName));
+                    return false;
+                }
+
+                // Setup the command
+                string query = string.Format(API_InstallQuery, connectInfo.IP);
+                query += "?package=" + WWW.EscapeURL(appDetails.PackageFullName);
+
+                // Use HttpWebRequest for a delete query
+                var request = (HttpWebRequest)WebRequest.Create(query);
+                request.Timeout = TimeoutMS;
+                request.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+                request.Method = "DELETE";
+                using (var httpResponse = (HttpWebResponse)request.GetResponse())
+                {
+                    Debug.Log("Response = " + httpResponse.StatusDescription);
+                    httpResponse.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool LaunchApp(string packageFamilyName, ConnectInfo connectInfo)
         {
             // Find the app description
-            AppDetails appDetails = QueryAppDetails(packageFamilyName, targetDevice);
-
-            if (appDetails == null)
-            {
-                Debug.LogWarning("Application not found");
-                return false;
-            }
-
-            string query = string.Format(API_AppQuery, FinalizeUrl(targetDevice.IP)) +
-                string.Format("?appid={0}&package={1}",
-                WWW.EscapeURL(EncodeTo64(appDetails.PackageRelativeId)),
-                WWW.EscapeURL(appDetails.PackageFullName));
-            WebRequestPost(query, null, GetBasicAuthHeader(targetDevice), false);
-
-            return IsAppRunning(PlayerSettings.productName, targetDevice);
-        }
-
-        [Obsolete("KillApp(string packageFamilyName, ConnectInfo targetDevice)")]
-        public static bool KillApp(string packageFamilyName, string targetIp)
-        {
-            return KillApp(packageFamilyName, new ConnectInfo(targetIp, BuildDeployPrefs.DeviceUser, BuildDeployPrefs.DevicePassword));
-        }
-
-        /// <summary>
-        /// Kills the target application on the target device.
-        /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <param name="targetDevice"></param>
-        /// <param name="showDialog"></param>
-        /// <returns>true, if application was successfully stopped.</returns>
-        public static bool KillApp(string packageFamilyName, ConnectInfo targetDevice, bool showDialog = true)
-        {
-            AppDetails appDetails = QueryAppDetails(packageFamilyName, targetDevice);
+            AppDetails appDetails = QueryAppDetails(packageFamilyName, connectInfo);
             if (appDetails == null)
             {
                 Debug.LogError("Application not found");
                 return false;
             }
 
-            string query = string.Format("{0}?package={1}",
-                string.Format(API_AppQuery, FinalizeUrl(targetDevice.IP)),
-                WWW.EscapeURL(EncodeTo64(appDetails.PackageFullName)));
+            // Setup the command
+            string query = string.Format(API_AppQuery, connectInfo.IP);
+            query += "?appid=" + WWW.EscapeURL(EncodeTo64(appDetails.PackageRelativeId));
+            query += "&package=" + WWW.EscapeURL(appDetails.PackageFullName);
 
-            bool success = WebRequestDelete(query, GetBasicAuthHeader(targetDevice), showDialog);
-            MachineName targetMachine = GetMachineName(targetDevice);
+            // Use HttpWebRequest
+            var request = (HttpWebRequest)WebRequest.Create(query);
+            request.Timeout = TimeoutMS;
+            request.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+            request.Method = "POST";
 
-            if (success)
+            // Query
+            using (var httpResponse = (HttpWebResponse)request.GetResponse())
             {
-                Debug.LogFormat("Successfully stopped {0} on {1}.", packageFamilyName, targetMachine.ComputerName);
+                Debug.Log("Response = " + httpResponse.StatusDescription);
+                httpResponse.Close();
             }
 
-            return success;
+            return true;
         }
 
-        [Obsolete("DeviceLogFile_View(string packageFamilyName, ConnectInfo targetDevice)")]
-        public static bool DeviceLogFile_View(string packageFamilyName, string targetIp)
+        public static bool KillApp(string packageFamilyName, ConnectInfo connectInfo)
         {
-            return DeviceLogFile_View(packageFamilyName, new ConnectInfo(targetIp, BuildDeployPrefs.DeviceUser, BuildDeployPrefs.DevicePassword));
-        }
-
-        /// <summary>
-        /// Downloads and launches the Log file for the target application on the target device.
-        /// </summary>
-        /// <param name="packageFamilyName"></param>
-        /// <param name="targetDevice"></param>
-        /// <returns>True, if download success.</returns>
-        public static bool DeviceLogFile_View(string packageFamilyName, ConnectInfo targetDevice)
-        {
-            EditorUtility.DisplayProgressBar("Download Log", "Downloading Log File for " + packageFamilyName, 0.25f);
-
-            AppDetails appDetails = QueryAppDetails(packageFamilyName, targetDevice);
-            if (appDetails == null)
+            try
             {
-                Debug.LogWarningFormat("{0} not installed on target device", packageFamilyName);
-                EditorUtility.ClearProgressBar();
+                // Find the app description
+                AppDetails appDetails = QueryAppDetails(packageFamilyName, connectInfo);
+                if (appDetails == null)
+                {
+                    Debug.LogError("Application not found");
+                    return false;
+                }
+
+                // Setup the command
+                string query = string.Format(API_AppQuery, connectInfo.IP);
+                query += "?package=" + WWW.EscapeURL(EncodeTo64(appDetails.PackageFullName));
+
+                // And send it across
+                var request = (HttpWebRequest)WebRequest.Create(query);
+                request.Timeout = TimeoutMS;
+                request.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+                request.Method = "DELETE";
+                using (var httpResponse = (HttpWebResponse)request.GetResponse())
+                {
+                    Debug.Log("Response = " + httpResponse.StatusDescription);
+                    httpResponse.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex.ToString());
                 return false;
             }
 
-            string logFile = string.Format("{0}/{1}_{2}{3}{4}{5}{6}{7}_deviceLog.txt",
-                Application.temporaryCachePath,
-                targetDevice.MachineName,
-                DateTime.Now.Year,
-                DateTime.Now.Month,
-                DateTime.Now.Day,
-                DateTime.Now.Hour,
-                DateTime.Now.Minute,
-                DateTime.Now.Second);
-
-            string response = WebRequestGet(string.Format(API_FileQuery, FinalizeUrl(targetDevice.IP), appDetails.PackageFullName), GetBasicAuthHeader(targetDevice, true));
-            bool success = !string.IsNullOrEmpty(response);
-
-            if (success)
-            {
-                File.WriteAllText(logFile, response);
-                Process.Start(logFile);
-            }
-
-            EditorUtility.ClearProgressBar();
-
-            return success;
+            return true;
         }
 
-        /// <summary>
-        /// Returns the <see cref="NetworkInfo"/> for the target device.
-        /// </summary>
-        /// <param name="targetDevice"></param>
-        /// <returns></returns>
-        public static NetworkInfo GetNetworkInfo(ConnectInfo targetDevice)
+        public static bool DeviceLogFile_View(string packageFamilyName, ConnectInfo connectInfo)
         {
-            string response = WebRequestGet(string.Format(API_IpConfigQuery, FinalizeUrl(targetDevice.IP)), GetBasicAuthHeader(targetDevice, true), false);
-            if (!string.IsNullOrEmpty(response))
+            using (var client = new TimeoutWebClient())
             {
-                return JsonUtility.FromJson<NetworkInfo>(response);
+                client.Credentials = new NetworkCredential(connectInfo.User, connectInfo.Password);
+                try
+                {
+                    // Setup
+                    string logFile = Application.temporaryCachePath + @"/deviceLog.txt";
+
+                    // Get the app details...
+                    AppDetails appDetails = QueryAppDetails(packageFamilyName, connectInfo);
+                    if (appDetails == null)
+                    {
+                        Debug.LogError("Application not found on target device (" + packageFamilyName + ")");
+                        return false;
+                    }
+
+                    // Download the file
+                    string query = string.Format(API_FileQuery, connectInfo.IP);
+                    query += "?knownfolderid=LocalAppData";
+                    query += "&filename=UnityPlayer.log";
+                    query += "&packagefullname=" + appDetails.PackageFullName;
+                    query += "&path=%5C%5CTempState";
+                    client.DownloadFile(query, logFile);
+
+                    // Open it up in default text editor
+                    Process.Start(logFile);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError(ex.ToString());
+                    return false;
+                }
             }
 
-            return null;
+            return true;
         }
 
-        /// <summary>
-        /// This Utility method finalizes the URL and formats the HTTPS string if needed.
-        /// <remarks>Local Machine will be changed to 127.0.1:10080 for HoloLens connections.</remarks>
-        /// </summary>
-        /// <param name="targetUrl"></param>
-        /// <returns></returns>
-        private static string FinalizeUrl(string targetUrl)
-        {
-            string ssl = BuildDeployPrefs.UseSSL ? "s" : string.Empty;
-
-            if (targetUrl.Contains("Local Machine"))
-            {
-                targetUrl = "127.0.0.1:10080";
-                ssl = string.Empty;
-            }
-            return string.Format(@"http{0}://{1}", ssl, targetUrl);
-        }
-
+        // Helpers
         private static string EncodeTo64(string toEncode)
         {
             byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(toEncode);

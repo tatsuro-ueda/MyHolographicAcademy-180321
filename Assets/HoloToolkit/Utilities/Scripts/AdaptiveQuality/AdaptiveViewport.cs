@@ -27,7 +27,7 @@ namespace HoloToolkit.Unity
         private float MinViewportSize = 0.5f;
 
         [SerializeField]
-        private AdaptiveQuality qualityController = null;
+        private AdaptiveQuality qualityController;
 
         public float CurrentScale { get; private set; }
 

@@ -41,13 +41,13 @@ namespace HoloToolkit.Unity.InputModule
         public List<GameObject> Inputs = new List<GameObject>(0);
 
         [SerializeField]
-        private GameObject mouse = null;
+        private GameObject mouse;
 
         [SerializeField]
-        private GameObject leftHand = null;
+        private GameObject leftHand;
 
         [SerializeField]
-        private GameObject rightHand = null;
+        private GameObject rightHand;
 
         private void Awake()
         {

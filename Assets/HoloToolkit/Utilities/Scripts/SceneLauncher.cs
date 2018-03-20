@@ -15,18 +15,18 @@ namespace HoloToolkit.Unity
             public string ScenePath = string.Empty;
 
             [Tooltip("This toggle enables or disables the generation of a button for this specific scene.")]
-            public bool IsButtonEnabled = false;
+            public bool IsButtonEnabled;
         }
 
         [SerializeField]
         [Tooltip("The button scene mapping to keep track of which scenes are enabled in the scene launcher.  This list of scenes is generated from the build window's active scenes.")]
-        private SceneMapping[] sceneMapping = null;
+        private SceneMapping[] sceneMapping;
 
         [Tooltip("Location of the center of the grid of buttons in Unity space.")]
-        public GameObject ButtonSpawnLocation = null;
+        public GameObject ButtonSpawnLocation;
 
         [Tooltip("Prefab used as a button for each scene.")]
-        public SceneLauncherButton SceneButtonPrefab = null;
+        public SceneLauncherButton SceneButtonPrefab;
 
         [Tooltip("Number of rows in the grid of buttons. As more scenes are added, they will spread out horizontally using this number of rows.")]
         public int MaxRows = 5;

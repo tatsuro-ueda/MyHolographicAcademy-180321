@@ -12,13 +12,13 @@ namespace HoloToolkit.UI.Keyboard
         /// The text field to update.
         /// </summary>
         [SerializeField]
-        private Text m_TextField = null;
+        private Text m_TextField;
 
         /// <summary>
         /// The text field to update.
         /// </summary>
         [SerializeField]
-        private Image m_ImageField = null;
+        private Image m_ImageField;
 
         /// <summary>
         /// The color to switch to when the button is disabled.
@@ -29,12 +29,12 @@ namespace HoloToolkit.UI.Keyboard
         /// <summary>
         /// The color the text field starts as.
         /// </summary>
-        private Color m_StartingColor = Color.white;
+        private Color m_StartingColor;
 
         /// <summary>
         /// The button to check for disabled/enabled.
         /// </summary>
-        private Button m_Button = null;
+        private Button m_Button;
 
         /// <summary>
         /// Standard Unity start.

@@ -1,5 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//
+// Copyright (C) Microsoft. All rights reserved.
+//
 
 //
 // Depth only shader.  Writes to the depth buffer, but color writes are disabled for performance.

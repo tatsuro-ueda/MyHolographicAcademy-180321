@@ -50,11 +50,6 @@ namespace HoloToolkit.Unity.SharingWithUNET
         /// </summary>
         [SyncVar]
         public string AnchorName = "";
-        
-        /// <summary>
-        /// Use the spatial mapping to find a position for the anchor
-        /// </summary>
-        public bool UseSpatialMapping = true;
 
         /// <summary>
         /// Tracks if we have a shared anchor established
@@ -165,13 +160,10 @@ namespace HoloToolkit.Unity.SharingWithUNET
 #if UNITY_WSA
             objectToAnchor = SharedCollection.Instance.gameObject;
 
-            if (UseSpatialMapping) 
+            spatialMapping = SpatialMappingManager.Instance;
+            if (spatialMapping == null)
             {
-                spatialMapping = SpatialMappingManager.Instance;
-                if (spatialMapping == null)
-                {
-                    Debug.Log("Spatial mapping not found in scene. Better anchor locations can be found if a SpatialMappingManager is in the scene");
-                }
+                Debug.Log("Spatial mapping not found in scene. Better anchor locations can be found if a SpatialMappingManager is in the scene");
             }
 #endif
 
@@ -303,11 +295,7 @@ namespace HoloToolkit.Unity.SharingWithUNET
             // 2. just use the current object position if we don't have access to spatial mapping
             else if (spatialMapping == null)
             {
-                if (UseSpatialMapping)
-                {
-                    Debug.Log("No spatial mapping...");
-                }
-                
+                Debug.Log("No spatial mapping...");
                 ExportAnchorAtPosition(objectToAnchor.transform.position);
             }
             // 3. seek a vertex dense portion of spatial mapping

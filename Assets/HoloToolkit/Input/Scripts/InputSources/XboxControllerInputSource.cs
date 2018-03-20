@@ -43,7 +43,7 @@ namespace HoloToolkit.Unity.InputModule
         private XboxControllerMappingTypes cancelButton = XboxControllerMappingTypes.XboxB;
 
         [SerializeField]
-        private MappingEntry[] mapping = null;
+        private MappingEntry[] mapping;
 
         private int motionControllerCount = 0;
 

@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See LICENSE in the project root for license information.
-
-namespace HoloToolkit.Unity.InputModule
+﻿namespace HoloToolkit.Unity.InputModule
 {
     /// <summary>
     /// Since the InteractionSourceState is internal to UnityEngine.VR.WSA.Input,
