@@ -7,9 +7,32 @@ namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
     /// </summary>
     public class DebugLog : MonoBehaviour
     {
+        #region Public Valiables
 
         [Tooltip("3D Text の Text Mesh")]
         public TextMesh MyTextMesh;
+
+        /// <summary>
+        /// 本クラスをシングルトン化するための変数
+        /// </summary>
+        public static DebugLog Instance;
+
+        /// <summary>
+        /// 表示するメッセージを受け取るための public 変数
+        /// </summary>
+        public string Message;
+
+        #endregion
+
+        #region MonoBehaviour CallBacks
+
+        /// <summary>
+        /// 本クラスをシングルトン化する
+        /// </summary>
+        private void Awake()
+        {
+            Instance = this;
+        }
 
         /// <summary>
         /// スクリプトの public 変数を表示し続ける
@@ -27,11 +50,14 @@ namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
                 focusedName = focusedObject.name;
             }
 
-            this.MyTextMesh.text =
-                "Position: " + MyGazeManager.Instance.Position.ToString()
+            this.MyTextMesh.text = ""
+                + "Position: " + MyGazeManager.Instance.Position.ToString()
                 + "\nNormal: " + MyGazeManager.Instance.Normal.ToString()
                 + "\nFocusedGameObject: " + focusedName
+                + "\nMessage: " + this.Message
                 ;
         }
+
+        #endregion
     }
 }
