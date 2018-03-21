@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
+namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// InteractibleManager は、どの GameObject が現在フォーカスされているかを保持する

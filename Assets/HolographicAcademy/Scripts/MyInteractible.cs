@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
+namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// このクラスは GameObject をインタラクト可能にする。gaze されたとき何が起きるかを決定する。

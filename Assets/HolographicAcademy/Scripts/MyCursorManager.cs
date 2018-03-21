@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
+namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// MyCursorManager クラスは Cursor GameObject（複数）を扱います

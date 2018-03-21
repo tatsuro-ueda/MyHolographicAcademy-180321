@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
+namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// 書いたスクリプトが正常に動作しているか、3D Textに表示して確認する
