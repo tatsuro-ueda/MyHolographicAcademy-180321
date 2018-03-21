@@ -53,10 +53,12 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
             this.CursorOffHolograms.SetActive(false);
         }
 
+        /// <summary>
+        /// gaze がオブジェクトにヒットするか否かで、カーソルオブジェクトを切り替える
+        /// カーソルオブジェクトの transform に、ヒット地点の法線などを反映させる
+        /// </summary>
         private void Update()
         {
-            /* TODO: DEVELOPER CODING EXERCISE 2.b */
-
             if (MyGazeManager.Instance == null || 
                 this.CursorOnHolograms == null || 
                 this.CursorOffHolograms == null)
@@ -68,6 +70,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
             {
                 // ホログラムカーソルをアクティブにして表示する
                 this.CursorOnHolograms.SetActive(true);
+
                 // ホログラムカーソルを非アクティブにして非表示にする
                 this.CursorOffHolograms.SetActive(false);
 
@@ -77,6 +80,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
             {
                 // ホログラムなしカーソルをアクティブにして表示する
                 this.CursorOffHolograms.SetActive(true);
+
                 // ホログラムなしカーソルを非アクティブにして非表示にする
                 this.CursorOnHolograms.SetActive(false);
 

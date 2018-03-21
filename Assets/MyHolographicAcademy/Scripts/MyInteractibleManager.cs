@@ -74,16 +74,17 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
             }
 
             // フォーカスした瞬間にフォーカスしたオブジェクトに「GazeEntered」メッセージを送る
-            if (FocusedGameObject != oldFocusedGameObject)
+            if (this.FocusedGameObject != this.oldFocusedGameObject)
             {
-                ResetFocusedInteractible();
+                // フォーカスが外れたオブジェクトに「GazeExited」メッセージを送る
+                this.ResetFocusedInteractible();
 
-                if (FocusedGameObject != null)
+                if (this.FocusedGameObject != null)
                 {
-                    if (FocusedGameObject.GetComponent<MyInteractible>() != null)
+                    if (this.FocusedGameObject.GetComponent<MyInteractible>() != null)
                     {
-                        // 2.c: Send a GazeEntered message to the FocusedGameObject.
-                        FocusedGameObject.SendMessage("GazeEntered");
+                        // FocusedGameObject に GazeEntered メッセージを送る
+                        this.FocusedGameObject.SendMessage("GazeEntered");
                     }
                 }
             }
@@ -93,14 +94,17 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 
         #region Private Methods
 
+        /// <summary>
+        /// フォーカスが外れたオブジェクトに「GazeExited」メッセージを送る
+        /// </summary>
         private void ResetFocusedInteractible()
         {
-            if (oldFocusedGameObject != null)
+            if (this.oldFocusedGameObject != null)
             {
-                if (oldFocusedGameObject.GetComponent<MyInteractible>() != null)
+                if (this.oldFocusedGameObject.GetComponent<MyInteractible>() != null)
                 {
-                    // 2.c: Send a GazeExited message to the oldFocusedGameObject.
-                    oldFocusedGameObject.SendMessage("GazeExited");
+                    // oldFocusedGameObject に GazeExited メッセージを送る
+                    this.oldFocusedGameObject.SendMessage("GazeExited");
                 }
             }
         }

@@ -20,7 +20,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// <summary>
         /// 表示するメッセージを受け取るための public 変数
         /// </summary>
-        public string Message;
+        public string Log = "";
 
         #endregion
 
@@ -54,7 +54,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
                 + "Position: " + MyGazeManager.Instance.Position.ToString()
                 + "\nNormal: " + MyGazeManager.Instance.Normal.ToString()
                 + "\nFocusedGameObject: " + focusedName
-                + "\nMessage: " + this.Message
+                + "\nLog:\n" + this.Log
                 ;
         }
 

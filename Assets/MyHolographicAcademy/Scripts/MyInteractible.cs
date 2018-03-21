@@ -21,7 +21,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// </summary>
         public void GazeEntered()
         {
-            DebugLog.Instance.Message = gameObject.name + ": GazeEntered";
+            DebugLog.Instance.Log += gameObject.name + ": GazeEntered\n";
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// </summary>
         public void GazeExited()
         {
-            DebugLog.Instance.Message = gameObject.name + ": GazeExited";
+            DebugLog.Instance.Log += gameObject.name + ": GazeExited\n";
         }
 
         #endregion
