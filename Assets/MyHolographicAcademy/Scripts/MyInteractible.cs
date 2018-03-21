@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using HoloToolkit.Unity.InputModule;
+using UnityEngine;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// このクラスは GameObject をインタラクト可能にする。gaze されたとき何が起きるかを決定する。
     /// </summary>
-    public class MyInteractible : MonoBehaviour
+    public class MyInteractible : MonoBehaviour, IPointerSpecificFocusable
     {
         #region Public Valiables
 
@@ -50,16 +51,16 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 
         #endregion
 
-        #region Public Methods
-
+        #region IPointerSpecificFocusable CallBacks
+ 
         /// <summary>
         /// gaze された瞬間に呼ばれる
         /// </summary>
-        public void GazeEntered()
+        public void OnFocusEnter(PointerSpecificEventData eventData)
         {
             for (int i = 0; i < this.defaultMaterials.Length; i++)
             {
-                this.SetColorWithEmissionGamma(this.defaultMaterials[i], .02f);
+                this.SetColorWithEmissionGamma(this.defaultMaterials[i], 0.02f);
             }
 
             if (this.audioSource != null && !this.audioSource.isPlaying)
@@ -71,7 +72,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// <summary>
         /// gaze が外れた瞬間に呼ばれる
         /// </summary>
-        public void GazeExited()
+        public void OnFocusExit(PointerSpecificEventData eventData)
         {
             for (int i = 0; i < this.defaultMaterials.Length; i++)
             {
