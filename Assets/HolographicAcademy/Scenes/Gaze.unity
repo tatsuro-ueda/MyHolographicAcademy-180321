@@ -353,7 +353,7 @@ Prefab:
     - target: {fileID: 114000013851064060, guid: b2db04283121ca74495c2ee000fb4243,
         type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b2db04283121ca74495c2ee000fb4243, type: 2}
@@ -504,6 +504,7 @@ GameObject:
   - component: {fileID: 1702024408}
   - component: {fileID: 1702024409}
   - component: {fileID: 1702024410}
+  - component: {fileID: 1702024411}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -545,10 +546,21 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1702024407}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8c12bda586094814fb6b811e4aa8b0f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   CursorOnHolograms: {fileID: 1698247842}
   CursorOffHolograms: {fileID: 513502797}
+--- !u!114 &1702024411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1702024407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ec3c62ce9e9d14ca68e815f9f15acf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

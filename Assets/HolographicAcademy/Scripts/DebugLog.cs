@@ -16,9 +16,22 @@ namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
         /// </summary>
         private void Update()
         {
-            this.MyTextMesh.text = 
-                "Position: " + MyGazeManager.Instance.Position.ToString() +
-                "\nNormal: " + MyGazeManager.Instance.Normal.ToString();
+            var focusedObject = MyInteractibleManager.Instance.FocusedGameObject;
+            string focusedName;
+            if (focusedObject == null)
+            {
+                focusedName = "null";
+            }
+            else
+            {
+                focusedName = focusedObject.name;
+            }
+
+            this.MyTextMesh.text =
+                "Position: " + MyGazeManager.Instance.Position.ToString()
+                + "\nNormal: " + MyGazeManager.Instance.Normal.ToString()
+                + "\nFocusedGameObject: " + focusedName
+                ;
         }
     }
 }
