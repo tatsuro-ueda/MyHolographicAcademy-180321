@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MyTextMesh: {fileID: 339287794}
-  Message: 
+  Log: 
 --- !u!102 &339287794
 TextMesh:
   serializedVersion: 3
@@ -376,7 +376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MyTextMesh: {fileID: 1229859488}
-  Message: 
+  Log: 
 --- !u!102 &1229859488 stripped
 TextMesh:
   m_PrefabParentObject: {fileID: 102000010767390410, guid: bfdc7f60d7205c84f82a4806a5352d60,
@@ -478,7 +478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cad5b1adaf9f9b6468519e968f3037f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MyDebugLog: {fileID: 0}
+  TargetFeedbackSound: {fileID: 8300000, guid: 1e6758bd9d63c6c4ea09d8a9faae1346, type: 3}
 --- !u!1001 &1574046146
 Prefab:
   m_ObjectHideFlags: 0
