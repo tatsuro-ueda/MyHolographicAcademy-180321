@@ -3,12 +3,15 @@ using UnityEngine;
 
 namespace EDUCATION.FEELPHYSICS.HOLOGRAPHIC_ACADEMY
 {
+    /// <summary>
+    /// MyGazeManager はユーザーの gaze の場所（当たった場所と法線）を決定する
+    /// </summary>
     public class MyGazeManager : MonoBehaviour
     {
         #region Public Valiables
 
         /// <summary>
-        /// MyGazeManager はユーザーの gaze の場所（当たった場所と法線）を決定する
+        /// シングルトン化するための変数
         /// </summary>
         public static MyGazeManager Instance;
 
