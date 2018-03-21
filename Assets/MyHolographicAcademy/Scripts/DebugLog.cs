@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HoloToolkit.Unity.InputModule;
+using UnityEngine;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
@@ -39,23 +40,38 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// </summary>
         private void Update()
         {
-            var focusedObject = MyInteractibleManager.Instance.FocusedGameObject;
+            this.MyTextMesh.text = ""
+                + "Position: " + GazeManager.Instance.HitPosition.ToString()
+                + "\nNormal: " + GazeManager.Instance.HitNormal.ToString()
+                + "\nFocused: " + this.FocusedGameObjectName()
+                + "\nLog:\n" + this.Log
+                ;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// フォーカスされている GameObject の名前を取得する
+        /// </summary>
+        /// <returns>フォーカスされている GameObject の名前</returns>
+        private string FocusedGameObjectName()
+        {
+            RaycastHit hitInfo = GazeManager.Instance.HitInfo;
             string focusedName;
-            if (focusedObject == null)
+
+            if (hitInfo.collider != null)
             {
-                focusedName = "null";
+                // hitInfo に格納された衝突した GameObject を FocusedGameObject に割り当てる
+                focusedName = hitInfo.collider.gameObject.name;
             }
             else
             {
-                focusedName = focusedObject.name;
+                focusedName = "null";
             }
 
-            this.MyTextMesh.text = ""
-                + "Position: " + MyGazeManager.Instance.Position.ToString()
-                + "\nNormal: " + MyGazeManager.Instance.Normal.ToString()
-                + "\nFocusedGameObject: " + focusedName
-                + "\nLog:\n" + this.Log
-                ;
+            return focusedName;
         }
 
         #endregion
