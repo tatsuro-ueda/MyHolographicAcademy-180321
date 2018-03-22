@@ -178,7 +178,7 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/cd79ad885d1418701d72760
 1. [3D Object > Sphere] を選びます。
 1. 新しい GameObject を右クリックして、名前を「Test Sphere」に変更します。
 1. Debug Log の Transform の Position を (0, 0, 2) に、Scale を (0.1, 0.1, 0.1) にします。
-1. DebugLogManager スクリプトを新規作成
+1. DebugLog スクリプトを新規作成
 
 ```csharp
 using UnityEngine;
@@ -324,7 +324,8 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 
 https://github.com/weed/MyHolographicAcademy-180321/blob/fa47dcbf4651ee2220615cc78029e1755adf2674/Assets/HolographicAcademy/Scripts/MyCursorManager.cs#L1-L95
 
-1. スクリプトを Managers オブジェクトにアタッチ
+1. ヒエラルキービューで EmptyObject として manager オブジェクトを作ります
+1. 上記のスクリプトを Managers オブジェクトにアタッチ
 ### 動作確認
 1. Asset > HoloToolkit > Input > Prefabs > Cursor > Cursorプレハブをシーンに追加
 1. Cursor オブジェクトの Object Cursor コンポーネントをオフにする
@@ -341,7 +342,7 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/fa47dcbf4651ee2220615cc
 この節は長いです。がんばって下さい。
 
 gaze したオブジェクトに自動的にメッセージを送り、オブジェクトの状態を変えます。
-ここでは、gaze すると球の色が変わって音が鳴り、gaze が外れると元の色に戻って音が鳴るスクリプトを作成します。
+ここでは、gaze すると球の色が変わって音が鳴り、gaze が外れると元の色に戻るスクリプトを作成します。
 ### オブジェクトの取得
 #### ねらい
 InteractibleManager.cs は、視線のレイキャストがヒットした位置をフェッチし、ヒットした GameObject を保存します。
@@ -782,8 +783,7 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/8c678fdd40de1ccc265962e
 #### ねらい
 なるべくMRTKで用意されているスクリプトを使う
 #### スクリプトのオンオフ
-1. Managers の My Gaze Manager と My Cursor Manager と My Interactible Manager をオフにする
-1. Managers に GazeManager をアタッチする
+1. Managers オブジェクトを削除する（InputManager オブジェクトに GazeManager スクリプトがアタッチされている）
 1. Cursor の Object Cursor をオンにする
 #### MyInteractible スクリプト
 ##### region Public Methods

@@ -41,6 +41,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         private void Update()
         {
             this.MyTextMesh.text = ""
+                // 以下の2行がフォーカスが、外れたときにうまくはたらかない
                 + "Position: " + GazeManager.Instance.HitPosition.ToString()
                 + "\nNormal: " + GazeManager.Instance.HitNormal.ToString()
                 + "\nFocused: " + this.FocusedGameObjectName()
@@ -58,17 +59,15 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// <returns>フォーカスされている GameObject の名前</returns>
         private string FocusedGameObjectName()
         {
-            RaycastHit hitInfo = GazeManager.Instance.HitInfo;
             string focusedName;
 
-            if (hitInfo.collider != null)
+            if (GazeManager.Instance.HitObject == null)
             {
-                // hitInfo に格納された衝突した GameObject を FocusedGameObject に割り当てる
-                focusedName = hitInfo.collider.gameObject.name;
+                focusedName = "null";
             }
             else
             {
-                focusedName = "null";
+                focusedName = GazeManager.Instance.HitInfo.collider.gameObject.name;
             }
 
             return focusedName;
