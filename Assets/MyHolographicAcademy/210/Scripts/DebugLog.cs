@@ -1,22 +1,18 @@
 ﻿using HoloToolkit.Unity.InputModule;
 using UnityEngine;
+using HoloToolkit.Unity;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// 書いたスクリプトが正常に動作しているか、3D Textに表示して確認する
     /// </summary>
-    public class DebugLog : MonoBehaviour
+    public class DebugLog : Singleton<DebugLog>
     {
         #region Public Valiables
 
         [Tooltip("3D Text の Text Mesh")]
         public TextMesh MyTextMesh;
-
-        /// <summary>
-        /// 本クラスをシングルトン化するための変数
-        /// </summary>
-        public static DebugLog Instance;
 
         /// <summary>
         /// 表示するメッセージを受け取るための public 変数
@@ -26,14 +22,6 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         #endregion
 
         #region MonoBehaviour CallBacks
-
-        /// <summary>
-        /// 本クラスをシングルトン化する
-        /// </summary>
-        private void Awake()
-        {
-            Instance = this;
-        }
 
         /// <summary>
         /// スクリプトの public 変数を表示し続ける

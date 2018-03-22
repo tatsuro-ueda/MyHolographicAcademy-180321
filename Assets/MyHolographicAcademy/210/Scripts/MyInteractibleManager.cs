@@ -1,18 +1,14 @@
 ﻿using UnityEngine;
+using HoloToolkit.Unity;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
     /// <summary>
     /// InteractibleManager は、どの GameObject が現在フォーカスされているかを保持する
     /// </summary>
-    public class MyInteractibleManager : MonoBehaviour
+    public class MyInteractibleManager : Singleton<MyInteractibleManager>
     {
         #region Public Valiables
-
-        /// <summary>
-        /// このクラスをシングルトンとして使用するための変数
-        /// </summary>
-        public static MyInteractibleManager Instance;
 
         /// <summary>
         /// フォーカスされた GameObject を格納する変数
@@ -31,14 +27,6 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         #endregion
 
         #region MonoBehaviour CallBacks
-
-        /// <summary>
-        /// 本クラスをシングルトン化する
-        /// </summary>
-        private void Awake()
-        {
-            Instance = this;
-        }
 
         /// <summary>
         /// FocusedGameObject 変数を初期化する

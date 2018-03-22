@@ -1,4 +1,4 @@
-﻿using HoloToolkit.Unity.InputModule;
+﻿using HoloToolkit.Unity;
 using UnityEngine;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
@@ -6,14 +6,9 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
     /// <summary>
     /// MyGazeManager はユーザーの gaze の場所（当たった場所と法線）を決定する
     /// </summary>
-    public class MyGazeManager : MonoBehaviour
+    public class MyGazeManager : Singleton<MyGazeManager>
     {
         #region Public Valiables
-
-        /// <summary>
-        /// シングルトン化するための変数
-        /// </summary>
-        public static MyGazeManager Instance;
 
         [Tooltip("gazeが当たるかどうか計算する最大距離")]
         public float MaxGazeDistance = 5.0f;
@@ -47,11 +42,6 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         #region Private Valuables
 
         /// <summary>
-        /// gaze スタビライザー
-        /// </summary>
-        private GazeStabilizer gazeStabilizer;
-
-        /// <summary>
         /// gaze の始点
         /// </summary>
         private Vector3 gazeOrigin;
@@ -64,14 +54,6 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         #endregion
 
         #region MonoBehavior CallBacks
-
-        /// <summary>
-        /// 本クラスをシングルトン化する
-        /// </summary>
-        private void Awake()
-        {
-            Instance = this;
-        }
 
         /// <summary>
         /// gaze の Raycast の hitInfo を更新し続ける

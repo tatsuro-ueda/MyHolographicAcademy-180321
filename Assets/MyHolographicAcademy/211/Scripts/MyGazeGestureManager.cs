@@ -1,4 +1,4 @@
-﻿using HoloToolkit.Unity.InputModule;
+﻿using HoloToolkit.Unity;
 using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
@@ -8,17 +8,8 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
     /// ジェスチャーのエアタップを監視して、エアタップされたら、
     /// そのとき gaze でフォーカスしていたオブジェクトに OnSelect メッセージを送る
     /// </summary>
-    public class MyGazeGestureManager : MonoBehaviour
+    public class MyGazeGestureManager : Singleton<MyGazeGestureManager>
     {
-        #region Public Valiables
-
-        /// <summary>
-        /// シングルトン化するための変数
-        /// </summary>
-        public static MyGazeGestureManager Instance;
-
-        #endregion
-
         #region Public Valuables
 
         /// <summary>
@@ -40,8 +31,6 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// </summary>
         private void Start()
         {
-            Instance = this;
-
             // Select ジェスチャーを感知するために GestureRecognizer を準備する
             this.recognizer = new GestureRecognizer();
             this.recognizer.TappedEvent += this.Recognizer_TappedEvent;

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using HoloToolkit.Unity;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
@@ -9,14 +10,9 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
     /// ヒットした位置に適切なカーソルを設置します
     /// カーソルの法線はヒットした表面の法線に一致します
     /// </summary>
-    public class MyCursorManager : MonoBehaviour
+    public class MyCursorManager : Singleton<MyCursorManager>
     {
         #region Public Valuables
-
-        /// <summary>
-        /// シングルトン化するための変数
-        /// </summary>
-        public static MyCursorManager Instance;
 
         [Tooltip("ホログラムにヒットしているときに表示するカーソルオブジェクトをドラッグして下さい")]
         public GameObject CursorOnHolograms;
@@ -40,7 +36,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// <summary>
         /// カーソルが指定されていなければスクリプトを終了する
         /// </summary>
-        private void Awake()
+        override protected void Awake()
         {
             if (this.CursorOnHolograms == null || this.CursorOffHolograms == null)
             {
