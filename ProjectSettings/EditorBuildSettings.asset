@@ -4,4 +4,7 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/MyHolographicAcademy/210/Scenes/Gaze.unity
+    guid: 056fff41732a2124599be36fd594ba2c
