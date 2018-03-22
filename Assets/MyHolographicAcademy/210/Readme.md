@@ -30,7 +30,7 @@ Unity や MRTK のバージョンに依存せずに HoloAcademy 210 を学習で
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     public class MyGazeManager : MonoBehaviour
     {
@@ -183,7 +183,7 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/cd79ad885d1418701d72760
 ```csharp
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// 書いたスクリプトが正常に動作しているか、3D Textに表示して確認する
@@ -227,7 +227,7 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/cd79ad885d1418701d72760
 ```csharp
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// MyCursorManager クラスは Cursor GameObject（複数）を扱います
@@ -351,7 +351,7 @@ InteractibleManager.cs は、視線のレイキャストがヒットした位置
 ```csharp
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// InteractibleManager は、どの GameObject が現在フォーカスされているかを保持する
@@ -539,7 +539,7 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/701c43af75a48c09f7ff0b6
 ```csharp
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// このクラスは GameObject をインタラクト可能にする。gaze されたとき何が起きるかを決定する。
@@ -627,7 +627,7 @@ using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// このクラスは GameObject をインタラクト可能にする。gaze されたとき何が起きるかを決定する。

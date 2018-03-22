@@ -32,7 +32,7 @@ using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// 書いたスクリプトが正常に動作しているか、3D Textに表示して確認する

@@ -1,26 +1,36 @@
-﻿using HoloToolkit.Unity.InputModule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
+    /// <summary>
+    /// Select されたら GameObject の色を変える
+    /// </summary>
     public class ColorChanger : MonoBehaviour, IInputClickHandler
     {
         #region Private Valuables
 
+        /// <summary>
+        /// GameObject のマテリアル
+        /// </summary>
         private Material material;
 
+        /// <summary>
+        /// GameObject の現在の色
+        /// </summary>
         private Color colorNow;
 
         #endregion
 
         #region MonoBehaviour CallBacks
 
+        /// <summary>
+        /// マテリアルコンポーネントを取得し、青色で初期化する
+        /// </summary>
         private void Awake()
         {
-            material = this.gameObject.GetComponent<Renderer>().material;
+            this.material = this.gameObject.GetComponent<Renderer>().material;
             this.ChangeColor(Color.blue);
         }
 
@@ -28,24 +38,41 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         #region Public Methods
 
+        /// <summary>
+        /// IInputClickHandler インターフェースの実装
+        /// クリックするたびに色を変える
+        /// </summary>
+        /// <param name="eventData">eventData</param>
         public void OnInputClicked(InputClickedEventData eventData)
         {
             DebugLog.Instance.Log += "OnInputClicked\n";
-            if (colorNow == Color.red)
+            this.ChangeColor();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// 現在の色に応じて色を変える
+        /// </summary>
+        private void ChangeColor()
+        {
+            if (this.colorNow == Color.red)
             {
-                ChangeColor(Color.green);
+                this.ChangeColor(Color.green);
             }
-            else if (colorNow == Color.green)
+            else if (this.colorNow == Color.green)
             {
-                ChangeColor(Color.blue);
+                this.ChangeColor(Color.blue);
             }
-            else if (colorNow == Color.blue)
+            else if (this.colorNow == Color.blue)
             {
-                ChangeColor(Color.yellow);
+                this.ChangeColor(Color.yellow);
             }
-            else if (colorNow == Color.yellow)
+            else if (this.colorNow == Color.yellow)
             {
-                ChangeColor(Color.red);
+                this.ChangeColor(Color.red);
             }
             else
             {
@@ -53,16 +80,16 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
         }
 
-        #endregion
-        #region Private Methods
-
+        /// <summary>
+        /// 特定の色に変える
+        /// </summary>
+        /// <param name="color">色</param>
         private void ChangeColor(Color color)
         {
             this.colorNow = color;
-            this.material.SetColor("_Color", colorNow);
+            this.material.SetColor("_Color", this.colorNow);
         }
 
         #endregion
-
     }
 }
