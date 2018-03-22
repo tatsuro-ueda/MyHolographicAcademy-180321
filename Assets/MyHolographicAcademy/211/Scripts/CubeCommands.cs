@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using HoloToolkit.Unity.InputModule;
+using UnityEngine;
 
 namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 {
-    public class CubeCommands : MonoBehaviour
+    public class CubeCommands : MonoBehaviour, IInputClickHandler
     {
-
         #region Private Valuables
 
         private Material material;
@@ -31,7 +31,11 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         /// </summary>
         public void OnSelect()
         {
-            DebugLog.Instance.Log += "OnSelect\n";
+        }
+
+        public void OnInputClicked(InputClickedEventData eventData)
+        {
+            DebugLog.Instance.Log += "OnInputClicked\n";
             if (this.isBlue)
             {
                 material.SetColor("_Color", Color.red);
@@ -46,5 +50,4 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 
         #endregion
     }
-
 }
