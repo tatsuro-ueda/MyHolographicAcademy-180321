@@ -1,3 +1,8 @@
+# My Holographic Academy 210（日本語）
+
+![Gaze Interactable2 02](Readme_Data/gaze-interactable2-02.png)
+
+Unity や MRTK のバージョンに依存せずに HoloAcademy 210 を学習できるようにしたものです。
 # 準備
 ## プロジェクトの準備
 1. Unityでプロジェクトを新規作成
@@ -18,7 +23,7 @@
 ## ヒット
 ### ねらい
 視線の先（gaze）がヒットした地点の位置と法線を取得できるようにします
-### GazeManager スクリプト
+### MyGazeManager スクリプト
 1. Asset / Scripts フォルダを新規作成
 1. MyGazeManager スクリプトを新規作成
 
@@ -616,7 +621,154 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/701c43af75a48c09f7ff0b6
 #### ねらい
 フォーカスすると色が変わって音が鳴るようにします
 #### MyInteractible スクリプト
-※コード
+
+```csharp
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+
+
+namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+{
+    /// <summary>
+    /// このクラスは GameObject をインタラクト可能にする。gaze されたとき何が起きるかを決定する。
+    /// </summary>
+    public class MyInteractible : MonoBehaviour, IPointerSpecificFocusable
+    {
+        #region Public Valiables
+
+
+        [Tooltip("ホログラムにインタラクトしたときに鳴らすオーディオクリップ")]
+        public AudioClip TargetFeedbackSound;
+
+
+        #endregion
+
+
+        #region Private Valiables
+
+
+        /// <summary>
+        /// フォーカスしたときにオーディオクリップを再生するためのもの
+        /// </summary>
+        private AudioSource audioSource;
+
+
+        /// <summary>
+        /// フォーカスする対象の GameObject に当たっているマテリアルの配列
+        /// </summary>
+        private Material[] defaultMaterials;
+
+
+        #endregion
+
+
+        #region MonoBehaviour CallBacks
+
+
+        /// <summary>
+        /// もし Collider がなければ追加する
+        /// ＋オーディオクリップを再生する準備をする
+        /// </summary>
+        private void Start()
+        {
+            this.defaultMaterials = GetComponent<Renderer>().materials;
+
+
+            // もし Collider がなければ追加する
+            Collider collider = GetComponentInChildren<Collider>();
+            if (collider == null)
+            {
+                gameObject.AddComponent<BoxCollider>();
+            }
+
+
+            this.EnableAudioHapticFeedback();
+        }
+
+
+        #endregion
+
+
+        #region IPointerSpecificFocusable CallBacks
+ 
+        /// <summary>
+        /// gaze された瞬間に呼ばれる
+        /// </summary>
+        public void OnFocusEnter(PointerSpecificEventData eventData)
+        {
+            for (int i = 0; i < this.defaultMaterials.Length; i++)
+            {
+                this.SetColorWithEmissionGamma(this.defaultMaterials[i], 0.02f);
+            }
+
+
+            if (this.audioSource != null && !this.audioSource.isPlaying)
+            {
+                this.audioSource.Play();
+            }
+        }
+
+
+        /// <summary>
+        /// gaze が外れた瞬間に呼ばれる
+        /// </summary>
+        public void OnFocusExit(PointerSpecificEventData eventData)
+        {
+            for (int i = 0; i < this.defaultMaterials.Length; i++)
+            {
+                this.SetColorWithEmissionGamma(this.defaultMaterials[i], 0f);
+            }
+        }
+
+
+        #endregion
+
+
+        #region Private Methods
+
+
+        /// <summary>
+        /// オーディオクリップを再生するための AudioSource を追加する
+        /// </summary>
+        private void EnableAudioHapticFeedback()
+        {
+            if (this.TargetFeedbackSound != null)
+            {
+                this.audioSource = this.GetComponent<AudioSource>();
+                if (this.audioSource == null)
+                {
+                    this.audioSource = this.gameObject.AddComponent<AudioSource>();
+                }
+
+
+                this.audioSource.clip = this.TargetFeedbackSound;
+                this.audioSource.playOnAwake = false;
+                this.audioSource.spatialBlend = 1;
+                this.audioSource.dopplerLevel = 0;
+            }
+        }
+
+
+        /// <summary>
+        /// マテリアルを明るくする
+        /// </summary>
+        /// <param name="material">明るくするマテリアル</param>
+        /// <param name="gamma">どれくらい明るくするか</param>
+        private void SetColorWithEmissionGamma(Material material, float gamma)
+        {
+            var baseColor = material.color;
+            Color finalColor = baseColor * Mathf.LinearToGammaSpace(gamma);
+            material.SetColor("_EmissionColor", finalColor);
+        }
+
+
+        #endregion
+    }
+}
+```
+
+https://github.com/weed/MyHolographicAcademy-180321/blob/8c678fdd40de1ccc265962ee74958ea2cf0803e5/Assets/MyHolographicAcademy/210/Scripts/MyInteractible.cs#L1-L121
+
 1. Test Sphere の My Interactible コンポーネントの Target Feedback Sound 欄に Asset > HoloToolkit > UX > Audio > Interaction > Button_Press.wav をドラッグ
 #### マテリアルの編集
 1. Test Sphere の Default-Material の Emission のチェックをオンにする
@@ -698,3 +850,5 @@ https://github.com/weed/MyHolographicAcademy-180321/blob/57bd31a09ceae7c66328307
 ### 作業
 1. Test Sphere に Tagalong スクリプトをアタッチする
 1. Billboard コンポーネントの [Pivot Axis] を [free] に設定します。
+### 動作確認
+1. Play し、右クリックしたまま WSAD キーで前後左右に移動することができます。Test Sphere が視界の外に出るように移動しても追従してくることを確認して下さい。
