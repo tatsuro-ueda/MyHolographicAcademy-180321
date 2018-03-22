@@ -8,10 +8,9 @@ Unity や MRTK のバージョンに依存せずに HoloAcademy 210 を学習で
 1. Unityでプロジェクトを新規作成
 1. MRTKを導入
 1. メニュー＞Mixed Reality Toolkit＞Configure＞Apply Mixed Reality Project Setting（チェックボックスはデフォルト）
-1. Asset / HolographicAcademy フォルダを新規作成
+1. Asset / HolographicAcademy / 210 フォルダを新規作成
 ## シーンの準備
-1. Asset / Scenes フォルダを新規作成
-1. Gazeシーンを新規作成
+1. 210 フォルダの中で Gazeシーンを新規作成
 1. メニュー＞Mixed Reality Toolkit＞Configure＞Apply Mixed Reality Scene Setting（チェックボックスはデフォルト）
 1. Directional Lightを削除
 ## デバッグ用3D Textを作成
