@@ -1,7 +1,7 @@
 ﻿using HoloToolkit.Unity;
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// MyGazeManager はユーザーの gaze の場所（当たった場所と法線）を決定する

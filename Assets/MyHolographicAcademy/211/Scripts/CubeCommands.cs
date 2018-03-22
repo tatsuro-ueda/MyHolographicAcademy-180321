@@ -1,7 +1,7 @@
 ﻿using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     public class CubeCommands : MonoBehaviour, IInputClickHandler
     {

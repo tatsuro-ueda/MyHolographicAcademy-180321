@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using HoloToolkit.Unity;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// MyCursorManager クラスは Cursor GameObject（複数）を扱います

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using HoloToolkit.Unity;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// InteractibleManager は、どの GameObject が現在フォーカスされているかを保持する

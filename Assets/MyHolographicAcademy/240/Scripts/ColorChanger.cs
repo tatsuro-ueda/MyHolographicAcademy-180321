@@ -1,7 +1,10 @@
 ﻿using HoloToolkit.Unity.InputModule;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     public class ColorChanger : MonoBehaviour, IInputClickHandler
     {
@@ -9,7 +12,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
 
         private Material material;
 
-        private bool isBlue;
+        private Color colorNow;
 
         #endregion
 
@@ -18,8 +21,7 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         private void Awake()
         {
             material = this.gameObject.GetComponent<Renderer>().material;
-            material.SetColor("_Color", Color.blue);
-            this.isBlue = true;
+            this.ChangeColor(Color.blue);
         }
 
         #endregion
@@ -29,18 +31,38 @@ namespace EDUCATION.FEELPHYSICS.MY_HOLOGRAPHIC_ACADEMY
         public void OnInputClicked(InputClickedEventData eventData)
         {
             DebugLog.Instance.Log += "OnInputClicked\n";
-            if (this.isBlue)
+            if (colorNow == Color.red)
             {
-                material.SetColor("_Color", Color.red);
+                ChangeColor(Color.green);
+            }
+            else if (colorNow == Color.green)
+            {
+                ChangeColor(Color.blue);
+            }
+            else if (colorNow == Color.blue)
+            {
+                ChangeColor(Color.yellow);
+            }
+            else if (colorNow == Color.yellow)
+            {
+                ChangeColor(Color.red);
             }
             else
             {
-                material.SetColor("_Color", Color.blue);
+                throw new Exception("colorNow がおかしいです");
             }
-
-            this.isBlue = !this.isBlue;
         }
 
         #endregion
+        #region Private Methods
+
+        private void ChangeColor(Color color)
+        {
+            this.colorNow = color;
+            this.material.SetColor("_Color", colorNow);
+        }
+
+        #endregion
+
     }
 }
