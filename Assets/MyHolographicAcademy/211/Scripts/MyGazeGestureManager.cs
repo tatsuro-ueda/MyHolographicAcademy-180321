@@ -1,4 +1,5 @@
 ﻿using HoloToolkit.Unity;
+using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
