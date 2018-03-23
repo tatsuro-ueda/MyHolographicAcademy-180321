@@ -99,93 +99,159 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 1. Transform を Position(0, 0, 2), Scale(0.1, 0.1, 0.1) にする
 ### MyGazeGestureManager スクリプト
 1. Assets / MyHolographicAcademy / 211 / Scripts フォルダを新規作成
+2. 新規スクリプトを作成
 
 ```csharp
+using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
-/// <summary>
-/// ジェスチャーのエアタップを監視して、エアタップされたら、
-/// そのとき gaze でフォーカスしていたオブジェクトに OnSelect メッセージを送る
-/// </summary>
-public class MyGazeGestureManager : MonoBehaviour
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
-    #region Public Valiables
-
     /// <summary>
-    /// シングルトン化するための変数
+    /// ジェスチャーのエアタップを監視して、エアタップされたら、
+    /// そのとき gaze でフォーカスしていたオブジェクトに OnSelect メッセージを送る
     /// </summary>
-    public static MyGazeGestureManager Instance;
-
-    /// <summary>
-    /// gaze されているホログラムを格納する
-    /// </summary>
-    public GameObject FocusedObject;
-
-    #endregion
-
-    #region Public Valuables
-
-    /// <summary>
-    /// GestureRecognizer を保持するための変数
-    /// </summary>
-    private GestureRecognizer recognizer;
-
-    #endregion
-
-    #region MonoBehaviour CallBacks
-
-    /// <summary>
-    /// エアタップを監視するイベントを登録する
-    /// </summary>
-    private void Awake()
+    public class MyGazeGestureManager : Singleton<MyGazeGestureManager>
     {
-        Instance = this;
+        #region Public Valuables
 
-        // Select ジェスチャーを感知するために GestureRecognizer を準備する
-        this.recognizer = new GestureRecognizer();
-        this.recognizer.TappedEvent += this.Recognizer_TappedEvent;
-        this.recognizer.StartCapturingGestures();
-    }
+        /// <summary>
+        /// gaze されているホログラムを格納する
+        /// </summary>
+        private GameObject FocusedObject;
 
-    /// <summary>
-    /// エアタップされたらフォーカスされているオブジェクトに OnSelect メッセージを送る
-    /// </summary>
-    /// <param name="source">source</param>
-    /// <param name="tapCount">tapCount</param>
-    /// <param name="headRay">headRay</param>
-    private void Recognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray headRay)
-    {
-        // フォーカスされたオブジェクトとその親に OnSelect メッセージを送る
-        if (this.FocusedObject != null)
+        /// <summary>
+        /// GestureRecognizer を保持するための変数
+        /// </summary>
+        private GestureRecognizer recognizer;
+
+        #endregion
+
+        #region MonoBehaviour CallBacks
+
+        /// <summary>
+        /// エアタップを監視するイベントを登録する
+        /// </summary>
+        private void Start()
         {
-            this.FocusedObject.SendMessageUpwards("OnSelect");
-        }
-    }
-
-    /// <summary>
-    /// gaze してフォーカスしているオブジェクトを取得し続ける
-    /// </summary>
-    private void Update()
-    {
-        // どのホログラムがこのフレームでフォーカスされているか明らかにする
-        GameObject oldFocusedObject = this.FocusedObject;
-
-        this.FocusedObject = GazeManager.Instance.HitObject;
-
-        // もしこのフレームでフォーカスされているオブジェクトが変わった場合は、
-        // 新しいジェスチャーを探し始める
-        if (this.FocusedObject != oldFocusedObject)
-        {
-            this.recognizer.CancelGestures();
+            // Select ジェスチャーを感知するために GestureRecognizer を準備する
+            this.recognizer = new GestureRecognizer();
+            this.recognizer.TappedEvent += this.Recognizer_TappedEvent;
             this.recognizer.StartCapturingGestures();
         }
-    }
 
-    #endregion
+        /// <summary>
+        /// エアタップされたらフォーカスされているオブジェクトに OnSelect メッセージを送る
+        /// </summary>
+        /// <param name="source">source</param>
+        /// <param name="tapCount">tapCount</param>
+        /// <param name="headRay">headRay</param>
+        private void Recognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray headRay)
+        {
+            // フォーカスされたオブジェクトとその親に OnSelect メッセージを送る
+            if (this.FocusedObject != null)
+            {
+                this.FocusedObject.SendMessageUpwards("OnSelect");
+            }
+        }
+
+        /// <summary>
+        /// gaze してフォーカスしているオブジェクトを取得し続ける
+        /// </summary>
+        private void Update()
+        {
+            // どのホログラムがこのフレームでフォーカスされているか明らかにする
+            GameObject oldFocusedObject = this.FocusedObject;
+
+            this.FocusedObject = GazeManager.Instance.HitObject;
+
+            // もしこのフレームでフォーカスされているオブジェクトが変わった場合は、
+            // 新しいジェスチャーを探し始める
+            if (this.FocusedObject != oldFocusedObject)
+            {
+                this.recognizer.CancelGestures();
+                this.recognizer.StartCapturingGestures();
+            }
+        }
+
+        #endregion
+    }
 }
 ```
 1. ヒエラルキービューで EmptyObject として manager オブジェクトを作ります
 1. 上記のスクリプトを Managers オブジェクトにアタッチ
+### CubeCommand スクリプト
+1. 新規スクリプトを作成
+```csharp
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+
+namespace Education.FeelPhysics.MyHolographicAcademy
+{
+    /// <summary>
+    /// OnSelect メッセージを受け取ると色を切り替える
+    /// </summary>
+    public class CubeCommands : MonoBehaviour
+    {
+        #region Private Valuables
+
+        /// <summary>
+        /// GameObject のマテリアル
+        /// </summary>
+        private Material material;
+
+        /// <summary>
+        /// 表示している色が否か
+        /// </summary>
+        private bool isBlue;
+
+        #endregion
+
+        #region MonoBehaviour CallBacks
+
+        /// <summary>
+        /// 表示色を青にする
+        /// </summary>
+        private void Awake()
+        {
+            this.material = this.gameObject.GetComponent<Renderer>().material;
+            this.material.SetColor("_Color", Color.blue);
+            this.isBlue = true;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// ユーザーが Select ジェスチャーを行ったときに MyGazeGestureManager から呼ばれる
+        /// </summary>
+        public void OnSelect()
+        {
+            DebugLog.Instance.Log += "OnSelect\n";
+            if (this.isBlue)
+            {
+                this.material.SetColor("_Color", Color.red);
+            }
+            else
+            {
+                this.material.SetColor("_Color", Color.blue);
+            }
+
+            this.isBlue = !this.isBlue;
+        }
+
+        #endregion
+    }
+}
+```
+1. スクリプトを Test Cube にアタッチする
+### 動作確認
+1．GestureRecognizer が実機でしか動かないため、このスクリプトの動作確認は実機で行う。
+
+![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
+
+![Gesture Gesture Recognizer01](Readme_Data/Gesture_GestureRecognizer01.png)
 

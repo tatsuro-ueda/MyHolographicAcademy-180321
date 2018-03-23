@@ -46,8 +46,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="headRay">headRay</param>
         private void Recognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray headRay)
         {
-            DebugLog.Instance.Log += "Event fired\n";
-
             // フォーカスされたオブジェクトとその親に OnSelect メッセージを送る
             if (this.FocusedObject != null)
             {

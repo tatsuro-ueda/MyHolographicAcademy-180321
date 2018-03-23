@@ -3,22 +3,34 @@ using UnityEngine;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
-    public class CubeCommands : MonoBehaviour, IInputClickHandler
+    /// <summary>
+    /// OnSelect メッセージを受け取ると色を切り替える
+    /// </summary>
+    public class CubeCommands : MonoBehaviour
     {
         #region Private Valuables
 
+        /// <summary>
+        /// GameObject のマテリアル
+        /// </summary>
         private Material material;
 
+        /// <summary>
+        /// 表示している色が否か
+        /// </summary>
         private bool isBlue;
 
         #endregion
 
         #region MonoBehaviour CallBacks
 
+        /// <summary>
+        /// 表示色を青にする
+        /// </summary>
         private void Awake()
         {
-            material = this.gameObject.GetComponent<Renderer>().material;
-            material.SetColor("_Color", Color.blue);
+            this.material = this.gameObject.GetComponent<Renderer>().material;
+            this.material.SetColor("_Color", Color.blue);
             this.isBlue = true;
         }
 
@@ -31,18 +43,14 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// </summary>
         public void OnSelect()
         {
-        }
-
-        public void OnInputClicked(InputClickedEventData eventData)
-        {
-            DebugLog.Instance.Log += "OnInputClicked\n";
+            DebugLog.Instance.Log += "OnSelect\n";
             if (this.isBlue)
             {
-                material.SetColor("_Color", Color.red);
+                this.material.SetColor("_Color", Color.red);
             }
             else
             {
-                material.SetColor("_Color", Color.blue);
+                this.material.SetColor("_Color", Color.blue);
             }
 
             this.isBlue = !this.isBlue;
