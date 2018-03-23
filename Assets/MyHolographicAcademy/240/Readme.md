@@ -35,36 +35,39 @@ using UnityEngine;
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
-    /// 書いたスクリプトが正常に動作しているか、3D Textに表示して確認する
+    /// アタッチされた GameObject を gaze で動かし、エアタップで固定する
     /// </summary>
-    public class DebugLog : Singleton<DebugLog>
+    public class MyHologramPlacement : Singleton<MyHologramPlacement>, IInputClickHandler
     {
-        #region Public Valiables
-
-        [Tooltip("3D Text の Text Mesh")]
-        public TextMesh MyTextMesh;
+        #region Public Valuables
 
         /// <summary>
-        /// 表示するメッセージを受け取るための public 変数
+        /// すでにエアタップで固定されたか否か
         /// </summary>
-        public string Log = "";
+        public bool GotTransform;
 
         #endregion
 
         #region MonoBehaviour CallBacks
 
         /// <summary>
-        /// スクリプトの public 変数を表示し続ける
+        /// アタッチされた GameObject にフォーカスし続けるようにする
+        /// </summary>
+        private void Start()
+        {
+            InputManager.Instance.OverrideFocusedObject = this.gameObject;
+        }
+
+        /// <summary>
+        /// GameObject がまだ配置されていなければ、現在位置の視点の先の点の中間に配置する
         /// </summary>
         private void Update()
         {
-            this.MyTextMesh.text = ""
-                // 以下の2行がフォーカスが、外れたときにうまくはたらかない
-                + "Position: " + GazeManager.Instance.HitPosition.ToString()
-                + "\nNormal: " + GazeManager.Instance.HitNormal.ToString()
-                + "\nFocused: " + this.FocusedGameObjectName()
-                + "\nLog:\n" + this.Log
-                ;
+            if (!this.GotTransform)
+            {
+                this.transform.position = Vector3.Lerp(
+                    this.transform.position, this.ProposeTransformPosition(), 0.2f);
+            }
         }
 
         #endregion
@@ -72,23 +75,26 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         #region Private Methods
 
         /// <summary>
-        /// フォーカスされている GameObject の名前を取得する
+        /// カメラで見ている方向の 2m 先の地点
         /// </summary>
-        /// <returns>フォーカスされている GameObject の名前</returns>
-        private string FocusedGameObjectName()
+        /// <returns>カメラで見ている方向の2m先の地点</returns>
+        private Vector3 ProposeTransformPosition()
         {
-            string focusedName;
+            return Camera.main.transform.position + (Camera.main.transform.forward * 2);
+        }
 
-            if (GazeManager.Instance.HitObject == null)
-            {
-                focusedName = "null";
-            }
-            else
-            {
-                focusedName = GazeManager.Instance.HitInfo.collider.gameObject.name;
-            }
+        #endregion
 
-            return focusedName;
+        #region Public Methods
+
+        /// <summary>
+        /// エアタップすると「配置済み」としてフォーカスを外す
+        /// </summary>
+        /// <param name="eventData">eventData</param>
+        public void OnInputClicked(InputClickedEventData eventData)
+        {
+            this.GotTransform = true;
+            InputManager.Instance.OverrideFocusedObject = null;
         }
 
         #endregion
