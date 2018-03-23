@@ -17,21 +17,22 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         private Material material;
 
         /// <summary>
-        /// GameObject の現在の色
+        /// 表示している色が青か否か
         /// </summary>
-        private Color colorNow;
+        private bool isBlue;
 
         #endregion
 
         #region MonoBehaviour CallBacks
 
         /// <summary>
-        /// マテリアルコンポーネントを取得し、青色で初期化する
+        /// 表示色を青にする
         /// </summary>
         private void Awake()
         {
             this.material = this.gameObject.GetComponent<Renderer>().material;
-            this.ChangeColor(Color.blue);
+            this.material.SetColor("_Color", Color.blue);
+            this.isBlue = true;
         }
 
         #endregion
@@ -39,55 +40,21 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         #region Public Methods
 
         /// <summary>
-        /// IInputClickHandler インターフェースの実装
-        /// クリックするたびに色を変える
+        /// ユーザーが エアタップした色を切り替える
         /// </summary>
-        /// <param name="eventData">eventData</param>
         public void OnInputClicked(InputClickedEventData eventData)
         {
-            DebugLog.Instance.Log += "OnInputClicked\n";
-            this.ChangeColor();
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        /// <summary>
-        /// 現在の色に応じて色を変える
-        /// </summary>
-        private void ChangeColor()
-        {
-            if (this.colorNow == Color.red)
+            DebugLog.Instance.Log += "OnClicked\n";
+            if (this.isBlue)
             {
-                this.ChangeColor(Color.green);
-            }
-            else if (this.colorNow == Color.green)
-            {
-                this.ChangeColor(Color.blue);
-            }
-            else if (this.colorNow == Color.blue)
-            {
-                this.ChangeColor(Color.yellow);
-            }
-            else if (this.colorNow == Color.yellow)
-            {
-                this.ChangeColor(Color.red);
+                this.material.SetColor("_Color", Color.red);
             }
             else
             {
-                throw new Exception("colorNow がおかしいです");
+                this.material.SetColor("_Color", Color.blue);
             }
-        }
 
-        /// <summary>
-        /// 特定の色に変える
-        /// </summary>
-        /// <param name="color">色</param>
-        private void ChangeColor(Color color)
-        {
-            this.colorNow = color;
-            this.material.SetColor("_Color", this.colorNow);
+            this.isBlue = !this.isBlue;
         }
 
         #endregion

@@ -27,19 +27,17 @@ Unity や MRTK のバージョンに依存せずに HoloAcademy 210 を学習で
 1. MyGazeManager スクリプトを新規作成
 
 ```csharp
-using HoloToolkit.Unity.InputModule;
+using HoloToolkit.Unity;
 using UnityEngine;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
-    public class MyGazeManager : MonoBehaviour
+    /// <summary>
+    /// MyGazeManager はユーザーの gaze の場所（当たった場所と法線）を決定する
+    /// </summary>
+    public class MyGazeManager : Singleton<MyGazeManager>
     {
         #region Public Valiables
-
-        /// <summary>
-        /// MyGazeManager はユーザーの gaze の場所（当たった場所と法線）を決定する
-        /// </summary>
-        public static MyGazeManager Instance;
 
         [Tooltip("gazeが当たるかどうか計算する最大距離")]
         public float MaxGazeDistance = 5.0f;
@@ -73,11 +71,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         #region Private Valuables
 
         /// <summary>
-        /// gaze スタビライザー
-        /// </summary>
-        private GazeStabilizer gazeStabilizer;
-
-        /// <summary>
         /// gaze の始点
         /// </summary>
         private Vector3 gazeOrigin;
@@ -90,14 +83,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         #endregion
 
         #region MonoBehavior CallBacks
-
-        /// <summary>
-        /// 本クラスをシングルトン化する
-        /// </summary>
-        private void Awake()
-        {
-            Instance = this;
-        }
 
         /// <summary>
         /// gaze の Raycast の hitInfo を更新し続ける
@@ -163,7 +148,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 this.Normal = this.gazeDirection;
             }
         }
-
 
         #endregion
     }

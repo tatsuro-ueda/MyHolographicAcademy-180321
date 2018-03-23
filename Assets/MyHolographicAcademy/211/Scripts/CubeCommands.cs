@@ -16,7 +16,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         private Material material;
 
         /// <summary>
-        /// 表示している色が否か
+        /// 表示している色が青か否か
         /// </summary>
         private bool isBlue;
 
