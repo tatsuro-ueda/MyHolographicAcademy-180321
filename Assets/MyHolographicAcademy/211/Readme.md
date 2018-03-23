@@ -2,7 +2,7 @@
 
 
 
-Unity や MRTK のバージョンに依存せずに HoloAcademy 211 を学習できるようにしたものです。
+Unity や MRTK のバージョンに依存せずに HoloAcademy 211 を学習できるようにしたものです。また、可能な限り Unity の Play Mode で動かすことができるようにしています。
 # 準備
 ## プロジェクトの準備
 1. Unityでプロジェクトを新規作成
