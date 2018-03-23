@@ -2,7 +2,7 @@
 
 ![Gaze Interactable2 02](Readme_Data/gaze-interactable2-02.png)
 
-Unity や MRTK のバージョンに依存せずに HoloAcademy を学習できるようにしたものです。
+Unity や MRTK のバージョンに依存せずに HoloAcademy を学習できるようにしたものです。また、可能な限り Unity の Play Mode で動かすことができるようにしています。
 
 基本的に Markdown 文書です。
 
