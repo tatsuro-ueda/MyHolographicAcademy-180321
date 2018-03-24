@@ -250,6 +250,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 1. スクリプトを Test Cube にアタッチする
 #### 動作確認
 1．GestureRecognizer が実機でしか動かないため、このスクリプトの動作確認は実機 Remoting Player で行う。
+2. タップするごとに色が変わります
 
 ![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
 
@@ -432,5 +433,5 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 1. 上記のスクリプトを manager オブジェクトにアタッチ
 2. #### 動作確認
 1．手の存在感知が実機でしか動かないため、このスクリプトの動作確認は実機か Remoting Player で行う。
-
+2. 視野内に手が入ると「Detected」と表示されます。
 ![Gesture Hand Manager](Readme_Data/Gesture_HandManager.png)
