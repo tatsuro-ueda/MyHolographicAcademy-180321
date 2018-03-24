@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/MyHolographicAcademy/240/Sharing.unity
-    guid: 39f9c80e73afa6c4caeb6c08838b2c56
-  - enabled: 1
     path: Assets/MyHolographicAcademy/211/Gesture.unity
     guid: d0c193517e1c7a146ace872772d5dee4
+  - enabled: 1
+    path: Assets/MyHolographicAcademy/240/Sharing.unity
+    guid: 39f9c80e73afa6c4caeb6c08838b2c56
   - enabled: 1
     path: Assets/MyHolographicAcademy/210/Gaze.unity
     guid: 056fff41732a2124599be36fd594ba2c

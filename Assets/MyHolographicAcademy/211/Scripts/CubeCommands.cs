@@ -43,7 +43,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// </summary>
         public void OnSelect()
         {
-            DebugLog.Instance.Log += "OnSelect\n";
             if (this.isBlue)
             {
                 this.material.SetColor("_Color", Color.red);
