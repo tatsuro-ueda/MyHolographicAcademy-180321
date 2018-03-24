@@ -250,6 +250,7 @@ GameObject:
   - component: {fileID: 1242961356}
   - component: {fileID: 1242961355}
   - component: {fileID: 1242961354}
+  - component: {fileID: 1242961359}
   m_Layer: 0
   m_Name: Test Cube
   m_TagString: Untagged
@@ -335,6 +336,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1242961359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1242961353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a9ed7c115a449143af51924e95c96cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentState: 0
 --- !u!1001 &1408743263
 Prefab:
   m_ObjectHideFlags: 0
@@ -429,7 +442,7 @@ Prefab:
     - target: {fileID: 114000012667812730, guid: 8aaf37823b26ee449bb3b3d7775965c3,
         type: 2}
       propertyPath: ServerAddress
-      value: 172.25.14.4
+      value: 192.168.12.107
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8aaf37823b26ee449bb3b3d7775965c3, type: 2}
