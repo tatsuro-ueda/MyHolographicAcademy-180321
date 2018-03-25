@@ -70,9 +70,26 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private ImportExportState currentState = ImportExportState.Start;
 
+        /// <summary>
+        /// 格納されたアンカーデータを保持する
+        /// </summary>
+        private byte[] rawAnchorData;
+
+        /// <summary>
+        /// 接続した現在のルームを保持する。アンカー（複数）はルームに保持されている。
+        /// </summary>
+        private Room currentRoom;
+
+        /// <summary>
+        /// シェアリングサービスが準備完了しているか否かを保持する。
+        /// シェアリングアンカーのためにデータをアップロードしたりダウンロードしたりするためには、
+        /// シェアリングサービスが準備完了でなければならない。
+        /// </summary>
+        private bool sharingServiceReady;
+
         #endregion
 
-        #region Unity APIs
+        #region MonoBehaviour Lifecycle
 
         protected override void Awake()
         {
@@ -167,27 +184,77 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
         }
 
-        private void RoomManagerListener_AnchorsChanged(Room obj)
+        private void RoomManagerListener_AnchorsDownloaded(bool succesful, AnchorDownloadRequest request, XString failureReason)
         {
-            throw new NotImplementedException();
+            // rawAnchorData にアンカー情報を格納する
+            if (succesful)
+            {
+                int dataSize = request.GetDataSize();
+                AnchorDebugText.text += string.Format("\nAnchor size: {0} bytes.", dataSize.ToString());
+
+                this.rawAnchorData = new byte[dataSize];
+
+                // Update() でインポートする
+                currentState = ImportExportState.DataReady;
+            }
+            else
+            {
+                // ダウンロードに失敗したら、再試行する
+                AnchorDebugText.text += string.Format("\nAnchor download failed " + failureReason);
+                MakeAnchorDataRequest();
+            }
         }
 
-        private void RoomManagerListener_AnchorsDownloaded(bool arg1, AnchorDownloadRequest arg2, XString arg3)
+        /// <summary>
+        /// ルーム内のアンカーが変化したときに呼ばれる
+        /// </summary>
+        /// <param name="obj"></param>
+        private void RoomManagerListener_AnchorsChanged(Room room)
         {
-            throw new NotImplementedException();
+            AnchorDebugText.text += string.Format("\nAnchors in Room {0} changed", room.GetName());
+
+            // アンカーが変化したルームにいるなら…
+            if (currentRoom == room)
+            {
+                ResetState();
+            }
         }
 
-        private void CurrentUserJoinedSession(Session obj)
+        /// <summary>
+        /// ユーザがセッションに参加すると呼ばれる
+        /// ルーム関連のリクエストをする準備をシェアリングサービスが完了したことを知らせるイベント
+        /// </summary>
+        /// <param name="session">参加したセッション</param>
+        private void CurrentUserJoinedSession(Session session)
         {
-            throw new NotImplementedException();
+            if (SharingStage.Instance.Manager.GetLocalUser().IsValid())
+            {
+                // Update() でInitApi() する条件
+                sharingServiceReady = true;
+            }
+            else
+            {
+                AnchorDebugText.text += "\nUnable to get local user on session joined";
+            }
         }
 
-        private void CurrentUserLeftSession(Session obj)
+        /// <summary>
+        /// ユーザがセッションから退席すると呼ばれる
+        /// シェアリングサービスはルーム関連のリクエストを止めなければならない
+        /// </summary>
+        /// <param name="session">Session left.</param>
+        private void CurrentUserLeftSession(Session session)
         {
-            throw new NotImplementedException();
+            // Update() でInitApi() する条件
+            sharingServiceReady = false;
+
+            // セッションに再接続して新しいルームに参加できるように状態をリセットする
+            ResetState();
         }
 
         #endregion
+
+        #region Private Methods
 
         /// <summary>
         /// ローカルアンカー格納庫が準備完了になると呼ばれる
@@ -202,7 +269,44 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 anchorStore.Clear();
             }
 
+            // Update() で InitRoomApi() を実行する
             currentState = ImportExportState.Ready;
         }
+
+        /// <summary>
+        /// 共有アンカーをインポートするためのデータを取得する
+        /// ダウンロードが終了すると、RoomManager は RoomManagerListener_AnchorsDownloaded を起こす
+        /// </summary>
+        private void MakeAnchorDataRequest()
+        {
+            // DownloadAnchor でルームからアンカーをダウンロードする
+            if (roomManager.DownloadAnchor(currentRoom, currentRoom.GetAnchorName(0)))
+            {
+                currentState = ImportExportState.DataRequested;
+            }
+            else
+            {
+                AnchorDebugText.text += "Anchor Manager: Couldn't make the download request.";
+                currentState = ImportExportState.Failed;
+            }
+        }
+
+        /// <summary>
+        /// Anchor Manager の状態をリセットする
+        /// </summary>
+        private void ResetState()
+        {
+            if (anchorStore != null)
+            {
+                // Update() で InitRoomApi() を実行する
+                currentState = ImportExportState.Ready;
+            }
+            else
+            {
+                currentState = ImportExportState.AnchorStore_Initializing;
+            }
+        }
+
+        #endregion
     }
 }

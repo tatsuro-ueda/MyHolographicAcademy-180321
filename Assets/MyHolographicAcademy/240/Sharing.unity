@@ -152,6 +152,11 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 20770519707920992, guid: d29bc40b7f3df26479d6a0aac211c355,
+        type: 2}
+      propertyPath: m_ClearFlags
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d29bc40b7f3df26479d6a0aac211c355, type: 2}
   m_IsPrefabParent: 0
@@ -206,6 +211,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1154329281}
   - component: {fileID: 1154329280}
+  - component: {fileID: 1154329282}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -238,6 +244,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1154329282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1154329279}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1600cd2c84bc70d45ad76da1a20ab68e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1242961353
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,10 +361,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1242961353}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a9ed7c115a449143af51924e95c96cf, type: 3}
+  m_Script: {fileID: 11500000, guid: e84d8d34dfb1f5f47a2286b478abad2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentState: 0
+  KeepRoomAlive: 0
+  RoomName: DefaultRoom
+  AnchorDebugText: {fileID: 1540062352}
 --- !u!1001 &1408743263
 Prefab:
   m_ObjectHideFlags: 0
@@ -442,7 +461,7 @@ Prefab:
     - target: {fileID: 114000012667812730, guid: 8aaf37823b26ee449bb3b3d7775965c3,
         type: 2}
       propertyPath: ServerAddress
-      value: 192.168.12.107
+      value: 172.25.14.4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8aaf37823b26ee449bb3b3d7775965c3, type: 2}
