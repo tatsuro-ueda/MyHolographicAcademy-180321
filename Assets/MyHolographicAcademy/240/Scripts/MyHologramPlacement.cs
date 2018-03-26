@@ -32,11 +32,37 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform]
                 = this.GetHeadTransform;
 
+            // SharingStage should be valid at this point, but we may not be connected.
+            if (SharingStage.Instance.IsConnected)
+            {
+                Connected();
+            }
+            else
+            {
+                SharingStage.Instance.SharingManagerConnected += Connected;
+            }
+        }
+
+        private void Connected(object sender = null, EventArgs e = null)
+        {
             // API 更新
-            SharingStage.Instance.SessionsTracker.CurrentUserJoined += SessionsTracker_CurrentUserJoined;
+            SharingStage.Instance.SessionUsersTracker.UserJoined += UserJoinedSession;
+            //SharingStage.Instance.SessionsTracker.CurrentUserJoined += SessionsTracker_CurrentUserJoined;
             // .SessionUsersTracker.UserJoined += SessionUsersTracker_UserJoined;
         }
 
+        private void UserJoinedSession(User obj)
+        {
+            DebugLog.Instance.Log += "\nUser joined session";
+
+            if (GotTransform)
+            {
+                CustomMessages.Instance.SendHeadTransform(transform.localPosition, transform.localRotation);
+                DebugLog.Instance.Log += "\nUserJoined GotTransform > localPosition: " + transform.localPosition.ToString();
+            }
+        }
+
+        /*
         private void SessionsTracker_CurrentUserJoined(Session obj)
         {
             DebugLog.Instance.Log += "\nCurrent user joined session";
@@ -58,6 +84,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 DebugLog.Instance.Log += "\nUserJoined GotTransform > localPosition: " + transform.localPosition.ToString();
             }
         }
+        */
 
         /// <summary>
         /// GameObject がまだ配置されていなければ、現在位置の視点の先の点の中間に配置する
@@ -72,7 +99,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                     DebugLog.Instance.Log += "\nAnchor established";
                     // This triggers the animation sequence for the anchor model and
                     // puts the cool materials on the model.
-                    this.gameObject.SendMessage("OnSelect");
+                    //this.gameObject.SendMessage("OnSelect");
                 }
             }
             else
@@ -107,6 +134,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             transform.localRotation = CustomMessages.Instance.ReadQuaternion(msg);
             DebugLog.Instance.Log += "\nStart > GetHeadTransform > localPosition: " + transform.localPosition.ToString();
 
+            /*
             // The first time, we'll want to send the message to the anchor to do its animation and
             // swap its materials.
             if (GotTransform == false)
@@ -115,6 +143,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
 
             GotTransform = true;
+            */
         }
 
         #endregion
