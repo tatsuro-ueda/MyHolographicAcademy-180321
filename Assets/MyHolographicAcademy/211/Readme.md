@@ -2,7 +2,9 @@
 
 
 
-Unity や MRTK のバージョンに依存せずに HoloAcademy 211 を学習できるようにしたものです。また、可能な限り Unity の Play Mode で動かすことができるようにしています。
+Unity や MRTK のバージョンに依存せずに HoloAcademy 211 を学習できるようにしたものです。
+なおこの章の内容は手の動きを直接取るため、Unity の Play モードでは**動きません**。
+Remoting Player は手の動きを取ることが**できる**ため、これを使うのが良いでしょう。
 # 準備
 ## プロジェクトの準備
 1. Unityでプロジェクトを新規作成
@@ -249,12 +251,11 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 ```
 1. スクリプトを Test Cube にアタッチする
 #### 動作確認
-1．GestureRecognizer が実機でしか動かないため、このスクリプトの動作確認は実機 Remoting Player で行う。
 2. タップするごとに色が変わります
 
-![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
-
 ![Gesture Gesture Recognizer01](Readme_Data/Gesture_GestureRecognizer01.png)
+
+![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
 
 ### 手の検出
 1. 新規スクリプトを作成
@@ -432,6 +433,5 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 ```
 1. 上記のスクリプトを manager オブジェクトにアタッチ
 2. #### 動作確認
-1．手の存在感知が実機でしか動かないため、このスクリプトの動作確認は実機か Remoting Player で行う。
 2. 視野内に手が入ると「Detected」と表示されます。
 ![Gesture Hand Manager](Readme_Data/Gesture_HandManager.png)

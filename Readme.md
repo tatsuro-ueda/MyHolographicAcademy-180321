@@ -2,7 +2,8 @@
 
 ![Gaze Interactable2 02](Readme_Data/gaze-interactable2-02.png)
 
-Unity ‚â MRTK ‚Ìƒo[ƒWƒ‡ƒ“‚ÉˆË‘¶‚¹‚¸‚É HoloAcademy ‚ðŠwK‚Å‚«‚é‚æ‚¤‚É‚µ‚½‚à‚Ì‚Å‚·B‚Ü‚½A‰Â”\‚ÈŒÀ‚è Unity ‚Ì Play Mode ‚Å“®‚©‚·‚±‚Æ‚ª‚Å‚«‚é‚æ‚¤‚É‚µ‚Ä‚¢‚Ü‚·B
+Unity ‚â MRTK ‚Ìƒo[ƒWƒ‡ƒ“‚ÉˆË‘¶‚¹‚¸‚É HoloAcademy ‚ðŠwK‚Å‚«‚é‚æ‚¤‚É‚µ‚½‚à‚Ì‚Å‚·B
+‚Ü‚½A‰Â”\‚ÈŒÀ‚è Unity ‚Ì Play ƒ‚[ƒh‚Å“®‚©‚·‚±‚Æ‚ª‚Å‚«‚é‚æ‚¤‚É‚µ‚Ä‚¢‚Ü‚·B
 
 Šî–{“I‚É Markdown •¶‘‚Å‚·B
 
@@ -20,7 +21,7 @@ Unity ‚â MRTK ‚Ìƒo[ƒWƒ‡ƒ“‚ÉˆË‘¶‚¹‚¸‚É HoloAcademy ‚ðŠwK‚Å‚«‚é‚æ‚¤‚É‚µ‚½‚à‚Ì‚Å‚
 
 **u‚±‚±A‚±‚¤‚µ‚½•û‚ª‚¢‚¢‚æv**
 
-‚Æ‚¢‚¤‚Ì‚ª‚ ‚ê‚ÎAIssue ‚Å‚à Pull Request ‚Å‚àA‚¨‹CŒy‚É‚¨‘—‚è‰º‚³‚¢B
+‚Æ‚¢‚¤‚Ì‚ª‚ ‚ê‚ÎAIssue ‚Å‚à Pull Request ‚Å‚à Twitteri@feelphysicsjpj‚Å‚àA‚¨‹CŒy‚É‚¨‘—‚è‰º‚³‚¢B
 
 ## ƒNƒ[ƒ“‚É‚Â‚¢‚Ä
 
