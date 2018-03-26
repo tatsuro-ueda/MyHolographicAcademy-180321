@@ -253,9 +253,9 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 #### 動作確認
 2. タップするごとに色が変わります
 
-![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
-
 ![Gesture Gesture Recognizer01](Readme_Data/Gesture_GestureRecognizer01.png)
+
+![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
 
 ### 手の検出
 1. 新規スクリプトを作成
