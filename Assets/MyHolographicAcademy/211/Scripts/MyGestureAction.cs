@@ -8,33 +8,50 @@ namespace Education.FeelPhysics.MyHolographicAcademy
     /// </summary>
     public class MyGestureAction : MonoBehaviour
     {
-        [Tooltip("Rotation max speed controls amount of rotation.")]
+        #region Public Valuables
+
+        [Tooltip("ナビゲーションの繊細性")]
         public float RotationSensitivity = 0.002f;
 
         private Vector3 manipulationPreviousPosition;
 
+        /// <summary>
+        /// 回転速度
+        /// </summary>
         private float rotationFactor;
 
-        void Update()
+        #endregion
+
+        #region MonoBehaviour Lifecycle
+
+        /// <summary>
+        /// することは、回転だけ
+        /// </summary>
+        private void Update()
         {
-            PerformRotation();
+            this.PerformRotation();
         }
 
+        /// <summary>
+        /// NavigationX の値から回転速度を決め、GameObject を回転させる
+        /// </summary>
         private void PerformRotation()
         {
             if (MyGestureManager.Instance.IsNavigating &&
-            MyHandsManager.Instance.FocusedGameObject == gameObject)
+            MyHandsManager.Instance.FocusedGameObject == this.gameObject)
         {
-                /* TODO: DEVELOPER CODING EXERCISE 2.c */
+                // MyGestureManager の NavigationPosition.X に RotationSensitivity をかけて、
+                // rotationFactor（回転速度）を計算する
+                this.rotationFactor = MyGestureManager.Instance.NavigationPosition.x * this.RotationSensitivity;
 
-                // 2.c: Calculate rotationFactor based on MyGestureManager&#39;s NavigationPosition.X and multiply by RotationSensitivity.
-                // This will help control the amount of rotation.
-                rotationFactor = MyGestureManager.Instance.NavigationPosition.x * RotationSensitivity;
-
-                // 2.c: transform.Rotate along the Y axis using rotationFactor.
+                // rotationFactor を使って Y 軸に対して transform.Rotate する
                 transform.Rotate(new Vector3(0, -1 * rotationFactor, 0));
             }
         }
+
+        #endregion
+
+        #region Not Used
 
         void PerformManipulationStart(Vector3 position)
         {
@@ -56,5 +73,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 // 4.a: Increment this transform&#39;s position by the moveVector.
             }
         }
+
+        #endregion
     }
 }
