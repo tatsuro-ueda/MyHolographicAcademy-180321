@@ -515,6 +515,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2035573843}
   - component: {fileID: 2035573842}
+  - component: {fileID: 2035573844}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -546,3 +547,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2035573844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2035573841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 438f3af1d3ce25a4a9bb4bec7d3ea903, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FingerPressedSound: {fileID: 8300000, guid: 1e6758bd9d63c6c4ea09d8a9faae1346, type: 3}
