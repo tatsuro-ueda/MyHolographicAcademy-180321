@@ -701,6 +701,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 ```
 
 ### 動作確認
-1. NavigationPosition の値が -1.0 から 1.0 までの値を取ります
+1. Test Cube をホールドし、そのまま手を左右に動かすと Test Cube が回転します。
+2. NavigationPosition の値が -1.0 から 1.0 までの値を取ります
 
 ![Gesture Navigation](Readme_Data/Gesture_Navigation.png)
