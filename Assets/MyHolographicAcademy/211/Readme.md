@@ -22,7 +22,7 @@ Remoting Player は手の動きを取ることが**できる**ため、これを
 1. Debug Log の Transform の Position を (0.1, 0, 2) にします。
 1. Debug Log の Text Mesh コンポーネントの Anchor を Middle left にし、Alignment を Left にします。
 1. DebugLog スクリプトがなければ新規作成
-### DebugLog スクリプト
+## DebugLog スクリプト
 ```csharp
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
@@ -99,7 +99,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 ### 準備
 1. Cube を作り、Test Cube と名前を付けます
 1. Transform を Position(0, 0, 2), Scale(0.1, 0.1, 0.1) にする
-#### MyGazeGestureManager スクリプト
+### MyGazeGestureManager スクリプト
 1. Assets / MyHolographicAcademy / 211 / Scripts フォルダを新規作成
 2. 新規スクリプトを作成
 
@@ -184,7 +184,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 ```
 1. ヒエラルキービューで EmptyObject として manager オブジェクトを作ります
 1. 上記のスクリプトを manager オブジェクトにアタッチ
-#### CubeCommand スクリプト
+### CubeCommand スクリプト
 1. 新規スクリプトを作成
 ```csharp
 using HoloToolkit.Unity.InputModule;
@@ -250,16 +250,16 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 }
 ```
 1. スクリプトを Test Cube にアタッチする
-#### 動作確認
+### 動作確認
 2. タップするごとに色が変わります
 
 ![Gesture Gesture Recognizer01](Readme_Data/Gesture_GestureRecognizer01.png)
 
 ![Gesture Gesture Recognizer02](Readme_Data/Gesture_GestureRecognizer02.png)
 
-### 手の検出
+## 手の検出
 1. 新規スクリプトを作成
-#### MyHandManager スクリプト
+### MyHandManager スクリプト
 ```csharp
 using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
@@ -432,15 +432,15 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 }
 ```
 1. 上記のスクリプトを manager オブジェクトにアタッチ
-#### 動作確認
+### 動作確認
 2. 視野内に手が入ると「Detected」と表示されます。
 
 ![Gesture Hand Manager](Readme_Data/Gesture_HandManager.png)
 
-### ナビゲーション
-#### ねらい
+## ナビゲーション
+### ねらい
 ナビゲーションの値がどのように変化するかを確認する
-#### MyHandsManager
+### MyHandsManager
 1. manager オブジェクトに新規スクリプトを追加します
 
 ```csharp
@@ -615,7 +615,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 }
 ```
 
-#### MyGestureAction スクリプト
+### MyGestureAction スクリプト
 1. Test Cube に新規スクリプトを追加する
 
 ```csharp
@@ -701,5 +701,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 ```
 
 ### 動作確認
-1. NavigationX の値が -1 から 1 までの値を取ります
+1. NavigationPosition の値が -1.0 から 1.0 までの値を取ります
 
+![Gesture Navigation](Readme_Data/Gesture_Navigation.png)
