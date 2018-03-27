@@ -176,6 +176,8 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
             // NavigationPosition を relativePosition にする
             this.NavigationPosition = relativePosition;
+
+            DebugLog.Instance.Log = "NavigationPosition: " + NavigationPosition.ToString();
         }
 
         /// <summary>
