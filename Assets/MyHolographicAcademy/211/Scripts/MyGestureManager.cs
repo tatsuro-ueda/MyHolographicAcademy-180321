@@ -63,7 +63,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             ResetGestureRecognizers();
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
             // 2.b: Unregister the Tapped and Navigation events on the NavigationRecognizer.
             //NavigationRecognizer.TappedEvent -= NavigationRecognizer_TappedEvent;
@@ -92,7 +92,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <summary>
         /// Transition to a new GestureRecognizer.
         /// </summary>
-        /// <param name=&quot;newRecognizer&quot;>The GestureRecognizer to transition to.</param>
+        /// <param name="newRecognizer">The GestureRecognizer to transition to.</param>
         public void Transition(GestureRecognizer newRecognizer)
         {
             if (newRecognizer == null)
@@ -117,6 +117,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void NavigationRecognizer_NavigationStartedEvent(InteractionSourceKind source, Vector3 relativePosition, Ray ray)
         {
+            DebugLog.Instance.Log += "\nNavigationStarted > Focused: " + MyHandsManager.Instance.FocusedGameObject.ToString();
             // 2.b: Set IsNavigating to be true.
             IsNavigating = true;
 
@@ -147,6 +148,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void ManipulationRecognizer_ManipulationStartedEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
+            DebugLog.Instance.Log += "\nManipulationStarted > Focused: " + MyHandsManager.Instance.FocusedGameObject.ToString();
             if (MyHandsManager.Instance.FocusedGameObject != null)
             {
                 IsManipulating = true;
