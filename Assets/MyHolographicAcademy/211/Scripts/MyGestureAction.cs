@@ -9,7 +9,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
     public class MyGestureAction : MonoBehaviour
     {
         [Tooltip("Rotation max speed controls amount of rotation.")]
-        public float RotationSensitivity = 10.0f;
+        public float RotationSensitivity = 0.002f;
 
         private Vector3 manipulationPreviousPosition;
 
