@@ -1,98 +1,127 @@
-﻿using UnityEngine;
-using HoloToolkit.Unity;
+﻿using HoloToolkit.Unity;
+using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
+    /// <summary>
+    /// ナビゲーションとマニピュレーションのジェスチャーを認識し、フォーカスしているオブジェクトにメッセージを渡す
+    /// </summary>
     public class MyGestureManager : Singleton<MyGestureManager>
     {
+        #region Public Valuables
 
-        // Tap and Navigation gesture recognizer.
+        /// <summary>
+        /// タップとナビゲーションのジェスチャー認識器
+        /// </summary>
         public GestureRecognizer NavigationRecognizer { get; private set; }
 
-        // Manipulation gesture recognizer.
+        /// <summary>
+        /// マニピュレーションのジェスチャー認識器
+        /// </summary>
         public GestureRecognizer ManipulationRecognizer { get; private set; }
 
-        // Currently active gesture recognizer.
+        /// <summary>
+        /// 現在アクティブなジェスチャー認識器
+        /// </summary>
         public GestureRecognizer ActiveRecognizer { get; private set; }
 
+        /// <summary>
+        /// 現在ナビゲーションしているか否か
+        /// </summary>
         public bool IsNavigating { get; private set; }
 
+        /// <summary>
+        /// ナビゲーションの位置
+        /// </summary>
         public Vector3 NavigationPosition { get; private set; }
 
+        /// <summary>
+        /// 現在マニピュレーションしているか否か
+        /// </summary>
         public bool IsManipulating { get; private set; }
 
+        /// <summary>
+        /// マニピュレーションの位置
+        /// </summary>
         public Vector3 ManipulationPosition { get; private set; }
 
+        #endregion
+
+        #region MonoBehaviour Lifecycle
+
+        /// <summary>
+        /// ナビゲーションとマニピュレーションのイベントを登録する
+        /// </summary>
         protected override void Awake()
         {
-            /* TODO: DEVELOPER CODING EXERCISE 2.b */
+            // NavigationRecognizer をインスタンス化する
+            this.NavigationRecognizer = new GestureRecognizer();
 
-            // 2.b: Instantiate the NavigationRecognizer.
-            NavigationRecognizer = new GestureRecognizer();
-
-            // 2.b: Add Tap and NavigationX GestureSettings to the NavigationRecognizer&#39;s RecognizableGestures.
-            NavigationRecognizer.SetRecognizableGestures(
+            // Tap と NaviagationX を NavigationRecognizer の RecognizableGestures に追加する
+            this.NavigationRecognizer.SetRecognizableGestures(
                 GestureSettings.Tap |
                 GestureSettings.NavigationX);
 
             // 2.b: Register for the TappedEvent with the NavigationRecognizer_TappedEvent function.
             //NavigationRecognizer.TappedEvent += NavigationRecognizer_TappedEvent;
-            // 2.b: Register for the NavigationStartedEvent with the NavigationRecognizer_NavigationStartedEvent function.
-            NavigationRecognizer.NavigationStartedEvent += NavigationRecognizer_NavigationStartedEvent;
-            // 2.b: Register for the NavigationUpdatedEvent with the NavigationRecognizer_NavigationUpdatedEvent function.
-            NavigationRecognizer.NavigationUpdatedEvent += NavigationRecognizer_NavigationUpdatedEvent;
-            // 2.b: Register for the NavigationCompletedEvent with the NavigationRecognizer_NavigationCompletedEvent function.
-            NavigationRecognizer.NavigationCompletedEvent += NavigationRecognizer_NavigationCompletedEvent;
-            // 2.b: Register for the NavigationCanceledEvent with the NavigationRecognizer_NavigationCanceledEvent function.
-            NavigationRecognizer.NavigationCanceledEvent += NavigationRecognizer_NavigationCanceledEvent;
 
-            // Instantiate the ManipulationRecognizer.
-            ManipulationRecognizer = new GestureRecognizer();
+            // ナビゲーションイベントを ManipulationRecognizer に登録する
+            this.NavigationRecognizer.NavigationStartedEvent += this.NavigationRecognizer_NavigationStartedEvent;
+            this.NavigationRecognizer.NavigationUpdatedEvent += this.NavigationRecognizer_NavigationUpdatedEvent;
+            this.NavigationRecognizer.NavigationCompletedEvent += this.NavigationRecognizer_NavigationCompletedEvent;
+            this.NavigationRecognizer.NavigationCanceledEvent += this.NavigationRecognizer_NavigationCanceledEvent;
 
-            // Add the ManipulationTranslate GestureSetting to the ManipulationRecognizer&#39;s RecognizableGestures.
-            ManipulationRecognizer.SetRecognizableGestures(
+            // ManipulationRecognizer をインスタンス化する
+            this.ManipulationRecognizer = new GestureRecognizer();
+
+            // ManipulationTranslate を ManipulationRecognizer の RecognizableGestures に追加する
+            this.ManipulationRecognizer.SetRecognizableGestures(
                 GestureSettings.ManipulationTranslate);
 
-            // Register for the Manipulation events on the ManipulationRecognizer.
-            ManipulationRecognizer.ManipulationStartedEvent += ManipulationRecognizer_ManipulationStartedEvent;
-            ManipulationRecognizer.ManipulationUpdatedEvent += ManipulationRecognizer_ManipulationUpdatedEvent;
-            ManipulationRecognizer.ManipulationCompletedEvent += ManipulationRecognizer_ManipulationCompletedEvent;
-            ManipulationRecognizer.ManipulationCanceledEvent += ManipulationRecognizer_ManipulationCanceledEvent;
+            // マニピュレーションイベントを ManipulationRecognizer に登録する
+            this.ManipulationRecognizer.ManipulationStartedEvent += this.ManipulationRecognizer_ManipulationStartedEvent;
+            this.ManipulationRecognizer.ManipulationUpdatedEvent += this.ManipulationRecognizer_ManipulationUpdatedEvent;
+            this.ManipulationRecognizer.ManipulationCompletedEvent += this.ManipulationRecognizer_ManipulationCompletedEvent;
+            this.ManipulationRecognizer.ManipulationCanceledEvent += this.ManipulationRecognizer_ManipulationCanceledEvent;
 
-            ResetGestureRecognizers();
+            this.ResetGestureRecognizers();
         }
 
+        /// <summary>
+        /// イベントをすべて解除する
+        /// </summary>
         protected override void OnDestroy()
         {
             // 2.b: Unregister the Tapped and Navigation events on the NavigationRecognizer.
             //NavigationRecognizer.TappedEvent -= NavigationRecognizer_TappedEvent;
 
-            NavigationRecognizer.NavigationStartedEvent -= NavigationRecognizer_NavigationStartedEvent;
-            NavigationRecognizer.NavigationUpdatedEvent -= NavigationRecognizer_NavigationUpdatedEvent;
-            NavigationRecognizer.NavigationCompletedEvent -= NavigationRecognizer_NavigationCompletedEvent;
-            NavigationRecognizer.NavigationCanceledEvent -= NavigationRecognizer_NavigationCanceledEvent;
+            // ナビゲーションイベントを ManipulationRecognizer から解除する
+            this.NavigationRecognizer.NavigationStartedEvent -= this.NavigationRecognizer_NavigationStartedEvent;
+            this.NavigationRecognizer.NavigationUpdatedEvent -= this.NavigationRecognizer_NavigationUpdatedEvent;
+            this.NavigationRecognizer.NavigationCompletedEvent -= this.NavigationRecognizer_NavigationCompletedEvent;
+            this.NavigationRecognizer.NavigationCanceledEvent -= this.NavigationRecognizer_NavigationCanceledEvent;
 
-            // Unregister the Manipulation events on the ManipulationRecognizer.
-            ManipulationRecognizer.ManipulationStartedEvent -= ManipulationRecognizer_ManipulationStartedEvent;
-            ManipulationRecognizer.ManipulationUpdatedEvent -= ManipulationRecognizer_ManipulationUpdatedEvent;
-            ManipulationRecognizer.ManipulationCompletedEvent -= ManipulationRecognizer_ManipulationCompletedEvent;
-            ManipulationRecognizer.ManipulationCanceledEvent -= ManipulationRecognizer_ManipulationCanceledEvent;
+            // マニピュレーションイベントを ManipulationRecognizer から解除する
+            this.ManipulationRecognizer.ManipulationStartedEvent -= this.ManipulationRecognizer_ManipulationStartedEvent;
+            this.ManipulationRecognizer.ManipulationUpdatedEvent -= this.ManipulationRecognizer_ManipulationUpdatedEvent;
+            this.ManipulationRecognizer.ManipulationCompletedEvent -= this.ManipulationRecognizer_ManipulationCompletedEvent;
+            this.ManipulationRecognizer.ManipulationCanceledEvent -= this.ManipulationRecognizer_ManipulationCanceledEvent;
         }
 
         /// <summary>
-        /// Revert back to the default GestureRecognizer.
+        /// デフォルトの GestureRecognizer に戻る
         /// </summary>
         public void ResetGestureRecognizers()
         {
-            // Default to the navigation gestures.
-            Transition(NavigationRecognizer);
+            // ナビゲーションのジェスチャー認識に戻る
+            this.Transition(this.NavigationRecognizer);
         }
 
         /// <summary>
-        /// Transition to a new GestureRecognizer.
+        /// 新しい GestureRecognizer に移る
         /// </summary>
-        /// <param name="newRecognizer">The GestureRecognizer to transition to.</param>
+        /// <param name="newRecognizer">移る先の GestureRecognizer</param>
         public void Transition(GestureRecognizer newRecognizer)
         {
             if (newRecognizer == null)
@@ -100,85 +129,135 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 return;
             }
 
-            if (ActiveRecognizer != null)
+            if (this.ActiveRecognizer != null)
             {
-                if (ActiveRecognizer == newRecognizer)
+                if (this.ActiveRecognizer == newRecognizer)
                 {
                     return;
                 }
 
-                ActiveRecognizer.CancelGestures();
-                ActiveRecognizer.StopCapturingGestures();
+                this.ActiveRecognizer.CancelGestures();
+                this.ActiveRecognizer.StopCapturingGestures();
             }
 
             newRecognizer.StartCapturingGestures();
-            ActiveRecognizer = newRecognizer;
+            this.ActiveRecognizer = newRecognizer;
         }
 
+        #endregion
+
+        #region Event Callbacks
+
+        /// <summary>
+        /// ナビゲーション開始
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="relativePosition"></param>
+        /// <param name="ray"></param>
         private void NavigationRecognizer_NavigationStartedEvent(InteractionSourceKind source, Vector3 relativePosition, Ray ray)
         {
-            DebugLog.Instance.Log += "\nNavigationStarted > Focused: " + MyHandsManager.Instance.FocusedGameObject.ToString();
-            // 2.b: Set IsNavigating to be true.
-            IsNavigating = true;
+            // IsNavigating を true にする
+            this.IsNavigating = true;
 
-            // 2.b: Set NavigationPosition to be relativePosition.
-            NavigationPosition = relativePosition;
+            // NavigationPosition を relativePosition にする
+            this.NavigationPosition = relativePosition;
         }
 
+        /// <summary>
+        /// ナビゲーション中
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="relativePosition"></param>
+        /// <param name="ray"></param>
         private void NavigationRecognizer_NavigationUpdatedEvent(InteractionSourceKind source, Vector3 relativePosition, Ray ray)
         {
-            // 2.b: Set IsNavigating to be true.
-            IsNavigating = true;
+            // IsNavigating を true にする
+            this.IsNavigating = true;
 
-            // 2.b: Set NavigationPosition to be relativePosition.
-            NavigationPosition = relativePosition;
+            // NavigationPosition を relativePosition にする
+            this.NavigationPosition = relativePosition;
         }
 
+        /// <summary>
+        /// ナビゲーション終了
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="relativePosition"></param>
+        /// <param name="ray"></param>
         private void NavigationRecognizer_NavigationCompletedEvent(InteractionSourceKind source, Vector3 relativePosition, Ray ray)
         {
-            // 2.b: Set IsNavigating to be false.
-            IsNavigating = false;
+            // IsNavigating を false にする
+            this.IsNavigating = false;
         }
 
+        /// <summary>
+        /// ナビゲーションが何らかの原因でキャンセルされた
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="relativePosition"></param>
+        /// <param name="ray"></param>
         private void NavigationRecognizer_NavigationCanceledEvent(InteractionSourceKind source, Vector3 relativePosition, Ray ray)
         {
-            // 2.b: Set IsNavigating to be false.
-            IsNavigating = false;
+            // IsNavigating を false にする
+            this.IsNavigating = false;
         }
 
+        /// <summary>
+        /// マニピュレーション開始
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="position"></param>
+        /// <param name="ray"></param>
         private void ManipulationRecognizer_ManipulationStartedEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
-            DebugLog.Instance.Log += "\nManipulationStarted > Focused: " + MyHandsManager.Instance.FocusedGameObject.ToString();
             if (MyHandsManager.Instance.FocusedGameObject != null)
             {
-                IsManipulating = true;
+                this.IsManipulating = true;
 
-                ManipulationPosition = position;
+                this.ManipulationPosition = position;
 
                 MyHandsManager.Instance.FocusedGameObject.SendMessageUpwards("PerformManipulationStart", position);
             }
         }
 
+        /// <summary>
+        /// マニピュレーション中
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="position"></param>
+        /// <param name="ray"></param>
         private void ManipulationRecognizer_ManipulationUpdatedEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
             if (MyHandsManager.Instance.FocusedGameObject != null)
             {
-                IsManipulating = true;
+                this.IsManipulating = true;
 
-                ManipulationPosition = position;
+                this.ManipulationPosition = position;
 
                 MyHandsManager.Instance.FocusedGameObject.SendMessageUpwards("PerformManipulationUpdate", position);
             }
         }
 
+        /// <summary>
+        /// マニピュレーション終了
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="position"></param>
+        /// <param name="ray"></param>
         private void ManipulationRecognizer_ManipulationCompletedEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
-            IsManipulating = false;
+            this.IsManipulating = false;
         }
 
+        /// <summary>
+        /// マニピュレーションが何らかの原因でキャンセルされた
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="position"></param>
+        /// <param name="ray"></param>
         private void ManipulationRecognizer_ManipulationCanceledEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
-            IsManipulating = false;
+            this.IsManipulating = false;
         }
 
         /*
@@ -192,5 +271,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
         }
         */
+
+        #endregion
     }
 }
