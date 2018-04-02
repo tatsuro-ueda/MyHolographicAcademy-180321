@@ -51,26 +51,27 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         #endregion
 
-        #region Not Used
+        #region Manipulation
 
         void PerformManipulationStart(Vector3 position)
         {
             manipulationPreviousPosition = position;
         }
 
-        void PerformManipulationUpdate(Vector3 position)
+        void PerformManipulationUpdate(Vector3 positionUpdated)
         {
             if (MyGestureManager.Instance.IsManipulating)
             {
-                /* TODO: DEVELOPER CODING EXERCISE 4.a */
-
                 Vector3 moveVector = Vector3.zero;
 
-                // 4.a: Calculate the moveVector as position - manipulationPreviousPosition.
+                // moveVector を(位置 - manipulationPreviousPosition)で計算する
+                moveVector = positionUpdated - manipulationPreviousPosition;
 
-                // 4.a: Update the manipulationPreviousPosition with the current position.
+                // manipulationPreviousPosition を現在の位置で更新する
+                manipulationPreviousPosition = positionUpdated;
 
-                // 4.a: Increment this transform&#39;s position by the moveVector.
+                // 位置に moveVector を足す
+                transform.position += moveVector;
             }
         }
 
