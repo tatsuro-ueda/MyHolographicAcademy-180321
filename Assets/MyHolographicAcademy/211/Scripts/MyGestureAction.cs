@@ -13,6 +13,9 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         [Tooltip("ナビゲーションの繊細性")]
         public float RotationSensitivity = 0.002f;
 
+        /// <summary>
+        /// マニピュレーション中の1フレーム前の位置
+        /// </summary>
         private Vector3 manipulationPreviousPosition;
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 this.rotationFactor = MyGestureManager.Instance.NavigationPosition.x * this.RotationSensitivity;
 
                 // rotationFactor を使って Y 軸に対して transform.Rotate する
-                transform.Rotate(new Vector3(0, -1 * rotationFactor, 0));
+                transform.Rotate(new Vector3(0, -1 * this.rotationFactor, 0));
             }
         }
 
@@ -53,11 +56,21 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         #region Manipulation
 
+        /// <summary>
+        /// マニピュレーションを初期化する
+        /// 現在位置をマニピュレーションの開始位置にする
+        /// </summary>
+        /// <param name="position"></param>
         void PerformManipulationStart(Vector3 position)
         {
-            manipulationPreviousPosition = position;
+            this.manipulationPreviousPosition = position;
         }
 
+        /// <summary>
+        /// マニピュレーションを実行する
+        /// マニピュレーションの位置変化を使って GameObject の位置を変化させる
+        /// </summary>
+        /// <param name="positionUpdated"></param>
         void PerformManipulationUpdate(Vector3 positionUpdated)
         {
             if (MyGestureManager.Instance.IsManipulating)
@@ -65,10 +78,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 Vector3 moveVector = Vector3.zero;
 
                 // moveVector を(位置 - manipulationPreviousPosition)で計算する
-                moveVector = positionUpdated - manipulationPreviousPosition;
+                moveVector = positionUpdated - this.manipulationPreviousPosition;
 
                 // manipulationPreviousPosition を現在の位置で更新する
-                manipulationPreviousPosition = positionUpdated;
+                this.manipulationPreviousPosition = positionUpdated;
 
                 // 位置に moveVector を足す
                 transform.position += moveVector;
