@@ -1,4 +1,5 @@
 ﻿using HoloToolkit.Unity;
+using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 using UnityEngine.XR.WSA.Input;
 
@@ -60,11 +61,12 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
             // Tap と NaviagationX を NavigationRecognizer の RecognizableGestures に追加する
             this.NavigationRecognizer.SetRecognizableGestures(
-                GestureSettings.Tap |
-                GestureSettings.NavigationX);
+                GestureSettings.Tap
+                | GestureSettings.NavigationX
+                );
 
-            // 2.b: Register for the TappedEvent with the NavigationRecognizer_TappedEvent function.
-            //NavigationRecognizer.TappedEvent += NavigationRecognizer_TappedEvent;
+            // タップイベントを登録する
+            this.NavigationRecognizer.TappedEvent += this.NavigationRecognizer_TappedEvent;
 
             // ナビゲーションイベントを ManipulationRecognizer に登録する
             this.NavigationRecognizer.NavigationStartedEvent += this.NavigationRecognizer_NavigationStartedEvent;
@@ -77,8 +79,13 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
             // ManipulationTranslate を ManipulationRecognizer の RecognizableGestures に追加する
             this.ManipulationRecognizer.SetRecognizableGestures(
-                GestureSettings.ManipulationTranslate);
+                GestureSettings.Tap
+                | GestureSettings.ManipulationTranslate
+                );
 
+            // タップイベントを登録する
+            this.ManipulationRecognizer.Tapped += this.ManipulationRecognizer_Tapped;
+            
             // マニピュレーションイベントを ManipulationRecognizer に登録する
             this.ManipulationRecognizer.ManipulationStartedEvent += this.ManipulationRecognizer_ManipulationStartedEvent;
             this.ManipulationRecognizer.ManipulationUpdatedEvent += this.ManipulationRecognizer_ManipulationUpdatedEvent;
@@ -93,8 +100,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// </summary>
         protected override void OnDestroy()
         {
-            // 2.b: Unregister the Tapped and Navigation events on the NavigationRecognizer.
-            //NavigationRecognizer.TappedEvent -= NavigationRecognizer_TappedEvent;
+            this.NavigationRecognizer.TappedEvent -= this.NavigationRecognizer_TappedEvent;
 
             // ナビゲーションイベントを ManipulationRecognizer から解除する
             this.NavigationRecognizer.NavigationStartedEvent -= this.NavigationRecognizer_NavigationStartedEvent;
@@ -149,6 +155,18 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         #region Event Callbacks
 
         /// <summary>
+        /// タップしたら Recognizer を変えて色を変える
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="tapCount"></param>
+        /// <param name="headRay"></param>
+        private void NavigationRecognizer_TappedEvent(InteractionSourceKind source, int tapCount, Ray headRay)
+        {
+            this.Transition(this.ManipulationRecognizer);
+            GazeManager.Instance.HitObject.SendMessage("OnSelect");
+        }
+
+        /// <summary>
         /// ナビゲーション開始
         /// </summary>
         /// <param name="source"></param>
@@ -177,7 +195,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             // NavigationPosition を relativePosition にする
             this.NavigationPosition = relativePosition;
 
-            DebugLog.Instance.Log = "NavigationPosition: " + NavigationPosition.ToString();
+            DebugLog.Instance.Log = "NavigationPosition: " + this.NavigationPosition.ToString();
         }
 
         /// <summary>
@@ -190,6 +208,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         {
             // IsNavigating を false にする
             this.IsNavigating = false;
+            DebugLog.Instance.Log = "";
         }
 
         /// <summary>
@@ -202,6 +221,17 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         {
             // IsNavigating を false にする
             this.IsNavigating = false;
+            DebugLog.Instance.Log = "";
+        }
+
+        /// <summary>
+        /// タップしたら Recognizer を変えて色を変える
+        /// </summary>
+        /// <param name="obj"></param>
+        private void ManipulationRecognizer_Tapped(TappedEventArgs obj)
+        {
+            this.Transition(this.NavigationRecognizer);
+            GazeManager.Instance.HitObject.SendMessage("OnSelect");
         }
 
         /// <summary>
@@ -230,6 +260,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="ray"></param>
         private void ManipulationRecognizer_ManipulationUpdatedEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
+            DebugLog.Instance.Log = "ManipulationPosition: " + this.ManipulationPosition.ToString();
             if (MyHandsManager.Instance.FocusedGameObject != null)
             {
                 this.IsManipulating = true;
@@ -249,6 +280,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         private void ManipulationRecognizer_ManipulationCompletedEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
             this.IsManipulating = false;
+            DebugLog.Instance.Log = "";
         }
 
         /// <summary>
@@ -260,6 +292,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         private void ManipulationRecognizer_ManipulationCanceledEvent(InteractionSourceKind source, Vector3 position, Ray ray)
         {
             this.IsManipulating = false;
+            DebugLog.Instance.Log = "";
         }
 
         /*
