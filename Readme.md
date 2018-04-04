@@ -9,7 +9,8 @@ Unity ‚â MRTK ‚Ìƒo[ƒWƒ‡ƒ“‚ÉˆË‘¶‚¹‚¸‚É HoloAcademy ‚ğŠwK‚Å‚«‚é‚æ‚¤‚É‚µ‚½‚à‚Ì‚Å‚
 
 1. [210 Gaze](https://github.com/weed/MyHolographicAcademy-180321/tree/master/Assets/MyHolographicAcademy/210
 )
-2. 211
+1. [210 Gesture](https://github.com/weed/MyHolographicAcademy-180321/tree/master/Assets/MyHolographicAcademy/211
+)
 3. 212
 4. 220
 5. 230
