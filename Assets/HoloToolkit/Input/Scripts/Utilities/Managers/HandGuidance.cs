@@ -226,8 +226,7 @@ namespace HoloToolkit.Unity.InputModule
         private void InteractionManager_SourceReleased(InteractionSourceState hand)
         {
             // Stop displaying the guidance indicator when the user releases their finger from the pressed state.
-            RemoveTrackedHand(hand);
-        }
+777        }
 
         private void InteractionManager_SourceLost(InteractionSourceState hand)
         {
