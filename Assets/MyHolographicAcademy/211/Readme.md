@@ -1073,7 +1073,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         {
             if (MyGestureManager.Instance.IsNavigating &&
             MyHandsManager.Instance.FocusedGameObject == this.gameObject)
-        {
+            {
                 // MyGestureManager の NavigationPosition.X に RotationSensitivity をかけて、
                 // rotationFactor（回転速度）を計算する
                 this.rotationFactor = MyGestureManager.Instance.NavigationPosition.x * this.RotationSensitivity;
@@ -1126,3 +1126,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
 ### 動作確認
 
+青い状態だと回転します。
+
+![Gesture Navigation And Manipulation01](Readme_Data/Gesture_Navigation_and_Manipulation01.png)
+
+Test Cube をタップするとマニピュレーション・モードになります。マニピュレーションでTest Cube の位置を変えることができます。
+
+![Gesture Navigation And Manipulation02](Readme_Data/Gesture_Navigation_and_Manipulation02.png)

@@ -372,6 +372,11 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3eddd1c29199313478dd3f912bfab2ab, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1296217266 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1000012943254746, guid: b2db04283121ca74495c2ee000fb4243,
+    type: 2}
+  m_PrefabInternal: {fileID: 1914448312}
 --- !u!1001 &1685263663
 Prefab:
   m_ObjectHideFlags: 0
@@ -516,6 +521,7 @@ GameObject:
   - component: {fileID: 2035573843}
   - component: {fileID: 2035573842}
   - component: {fileID: 2035573844}
+  - component: {fileID: 2035573845}
   m_Layer: 0
   m_Name: manager
   m_TagString: Untagged
@@ -559,3 +565,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FingerPressedSound: {fileID: 8300000, guid: 1e6758bd9d63c6c4ea09d8a9faae1346, type: 3}
+--- !u!114 &2035573845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2035573841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ac869b7c13e5a542b695b17a48d0375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Cursor: {fileID: 1296217266}
+  HandGuidanceIndicator: {fileID: 1707333193821002, guid: f3c065ef92f8c1647b030de5ed643d50,
+    type: 2}
+  HandGuidanceThreshold: 0.5
