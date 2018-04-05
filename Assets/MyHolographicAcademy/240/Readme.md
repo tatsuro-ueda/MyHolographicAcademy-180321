@@ -2,7 +2,7 @@
 
 
 
-Unity や MRTK のバージョンに依存せずに HoloAcademy 240 を学習できるようにしたものです。
+Unity や MRTK のバージョンに依存せずに HoloAcademy 240（というより MRTK の Examples に入っている SharingTest ）を学習できるようにしたものです。
 # 準備
 ## プロジェクトの準備
 1. Unityでプロジェクトを新規作成
@@ -26,7 +26,7 @@ https://github.com/Microsoft/MixedRealityToolkit-Unity/blob/v1.2017.1.2/External
 ## UWP の機能をオンにする
 1. メニュー＞Mixed Reality Toolkit＞Configure＞Apply UWP Capability Setting
 1. 「Spatial Mapping」「InternetClientServer」「PrivateNetworkClientServer」をチェック
-## デバッグ用3D Textを作成
+## デバッグ用 3D Text を作成
 1. Asset > HoloToolkit > UX > Prefabs > 3DTextPrefab をヒエラルキービューにドラッグ
 1. 新しい GameObject を右クリックして、名前を「Debug Log」に変更します。
 1. Debug Log の Transform の Position を (0, 0.1, 2) にします。
@@ -51,10 +51,22 @@ Debug Log
 6. Sharing オブジェクトの Sharing World Anchor Manager の Anchor Debug Text の欄の右側の丸いボタンを押し、Debug Log を選択します。
 7. Sharing オブジェクトに Auto Join Session And Room スクリプトをアタッチします。
 8. 2台の HoloLens にアプリを配置します。
-9. 1台目のHoloLensでアンカーを取得・アップロードできていることを確認します。
+### 動作確認
+1. 1台目のHoloLensでアンカーを取得・アップロードできていることを確認します。
 
 ![Sharing01](Readme_Data/sharing01.jpg)
 
 1. 2台目のHoloLensでアンカーをダウンロードできていることを確認します。
 
 ![Sharing02](Readme_Data/sharing02.jpg)
+
+## HoloLensの位置を共有
+### ねらい
+とりあえず用意されているスクリプトでシェアリングできることを確かめます。
+### 手順
+1. Sharing オブジェクトに Custom Messages スクリプトをアタッチします。
+2. Sharing オブジェクトに Remote Head Manager スクリプトをアタッチします。
+### 動作確認
+1. 2台のHoloLensでアンカーのアップロード、ダウンロードに成功すれば、もう片方のHoloLensに Cube が載っているように表示されます。
+
+![Sharing Head](Readme_Data/sharing_head.png)
