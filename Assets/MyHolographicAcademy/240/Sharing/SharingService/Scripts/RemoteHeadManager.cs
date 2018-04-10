@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity;
+using HoloToolkit.Sharing;
 
-namespace HoloToolkit.Sharing.Tests
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// Broadcasts the head transform of the local user to other users in the session,
@@ -28,7 +29,7 @@ namespace HoloToolkit.Sharing.Tests
 
         private void Start()
         {
-            CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateHeadTransform;
+            CustomMessagesMyHolographicAcademy.Instance.MessageHandlers[CustomMessagesMyHolographicAcademy.TestMessageID.HeadTransform] = UpdateHeadTransform;
 
             // SharingStage should be valid at this point, but we may not be connected.
             if (SharingStage.Instance.IsConnected)
@@ -58,7 +59,7 @@ namespace HoloToolkit.Sharing.Tests
             Vector3 headPosition = transform.InverseTransformPoint(headTransform.position);
             Quaternion headRotation = Quaternion.Inverse(transform.rotation) * headTransform.rotation;
 
-            CustomMessages.Instance.SendHeadTransform(headPosition, headRotation);
+            CustomMessagesMyHolographicAcademy.Instance.SendHeadTransform(headPosition, headRotation);
         }
 
         protected override void OnDestroy()
@@ -132,9 +133,9 @@ namespace HoloToolkit.Sharing.Tests
             // Parse the message
             long userID = msg.ReadInt64();
 
-            Vector3 headPos = CustomMessages.Instance.ReadVector3(msg);
+            Vector3 headPos = CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg);
 
-            Quaternion headRot = CustomMessages.Instance.ReadQuaternion(msg);
+            Quaternion headRot = CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg);
 
             RemoteHeadInfo headInfo = GetRemoteHeadInfo(userID);
             headInfo.HeadObject.transform.localPosition = headPos;

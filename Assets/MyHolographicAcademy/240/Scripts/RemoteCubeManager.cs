@@ -4,16 +4,18 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+using HoloToolkit.Sharing;
 using HoloToolkit.Unity;
 
-namespace HoloToolkit.Sharing.Tests
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// Broadcasts the Cube transform of the local user to other users in the session,
     /// and adds and updates the Cube transforms of remote users.
     /// Cube transforms are sent and received in the local coordinate space of the GameObject this component is on.
     /// </summary>
-    public class CubeSharingManager : Singleton<CubeSharingManager>
+    public class RemoteCubeManager : Singleton<RemoteCubeManager>
     {
         public class RemoteCubeInfo
         {
@@ -38,7 +40,9 @@ namespace HoloToolkit.Sharing.Tests
 
         private void Start()
         {
-            CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateCubeTransform;
+            CustomMessagesMyHolographicAcademy.Instance.MessageHandlers
+                [CustomMessagesMyHolographicAcademy.TestMessageID.CubeTransform] = UpdateCubeTransform;
+            //CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateCubeTransform;
             DebugLogText.text += "\n[Cube] Set UpdateCubeTransform as MessageHandlers";
 
             // SharingStage should be valid at this point, but we may not be connected.
@@ -73,20 +77,25 @@ namespace HoloToolkit.Sharing.Tests
             Vector3 CubePosition = transform.InverseTransformPoint(CubeTransform.position);
             Quaternion CubeRotation = Quaternion.Inverse(transform.rotation) * CubeTransform.rotation;
             CustomMessages.Instance.SendHeadTransform(CubePosition, CubeRotation);
-            */
-
-            Transform CubeTransform = CameraCache.Main.transform;
-
-            Transform Cube2Transform = this.gameObject.transform;
 
             DebugLog2Text.text = "\nHead > "
                 + "\nPosition: " + CubeTransform.position.ToString()
                 + "\nCube > "
                 + "\nPosition: " + Cube2Transform.position.ToString();
+            */
 
-            Vector3 CubePosition = transform.InverseTransformPoint(CubeTransform.position);
-            Quaternion CubeRotation = Quaternion.Inverse(transform.rotation) * CubeTransform.rotation;
-            CustomMessages.Instance.SendHeadTransform(CubePosition, CubeRotation);
+            // Transform the head position and rotation from world space into local space
+            Vector3 cubePosition = GameObject.Find("Sharing").transform.
+                InverseTransformPoint(GameObject.Find("Sharing Cube").transform.position);
+            /*
+            Quaternion cubeRotation = Quaternion.Inverse(transform.rotation) *
+                GameObject.Find("Sharing").transform.rotation;
+            */
+            Quaternion cubeRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
+                InverseTransformDirection(GameObject.Find("Sharing Cube").transform.eulerAngles));
+            CustomMessagesMyHolographicAcademy.Instance.SendCubeTransform(cubePosition, cubeRotation);
+            DebugLog2Text.text = "\nSend Cube > " +
+                "\nPosition: " + cubePosition.ToString();
         }
 
         protected override void OnDestroy()
@@ -99,8 +108,6 @@ namespace HoloToolkit.Sharing.Tests
                     SharingStage.Instance.SessionUsersTracker.UserLeft -= UserLeftSession;
                 }
             }
-
-            base.OnDestroy();
         }
 
         /// <summary>
@@ -109,12 +116,15 @@ namespace HoloToolkit.Sharing.Tests
         /// <param name="user">User that left the current session.</param>
         private void UserLeftSession(User user)
         {
+            DebugLogText.text += "\n[Cube] UserLeftSession > User ID: " + user.GetID().ToString();
+            /*
             int userId = user.GetID();
             if (userId != SharingStage.Instance.Manager.GetLocalUser().GetID())
             {
                 RemoveRemoteCube(remoteCubes[userId].CubeObject);
                 remoteCubes.Remove(userId);
             }
+            */
         }
 
         /// <summary>
@@ -123,16 +133,16 @@ namespace HoloToolkit.Sharing.Tests
         /// <param name="user">User that joined the current session.</param>
         private void UserJoinedSession(User user)
         {
-            DebugLogText.text += "\n[Cube] UserJoinedSession > User " + user.ToString();
             DebugLogText.text += "\n[Cube] UserJoinedSession > User ID: " + user.GetID().ToString();
-            DebugLogText.text += "\n[Cube] UserJoinedSession > Local user ID: "
-                + SharingStage.Instance.Manager.GetLocalUser().GetID();
+            /*
             if (user.GetID() != SharingStage.Instance.Manager.GetLocalUser().GetID())
             {
                 GetRemoteCubeInfo(user.GetID());
             }
+            */
         }
 
+        /*
         /// <summary>
         /// Gets the data structure for the remote users' Cube position.
         /// </summary>
@@ -157,6 +167,7 @@ namespace HoloToolkit.Sharing.Tests
 
             return CubeInfo;
         }
+        */
 
         /// <summary>
         /// Called when a remote user sends a Cube transform.
@@ -167,18 +178,19 @@ namespace HoloToolkit.Sharing.Tests
             // Parse the message
             long userID = msg.ReadInt64();
 
-            Vector3 CubePos = CustomMessages.Instance.ReadVector3(msg);
-
-            Quaternion CubeRot = CustomMessages.Instance.ReadQuaternion(msg);
-
-            RemoteCubeInfo CubeInfo = GetRemoteCubeInfo(userID);
-            CubeInfo.CubeObject.transform.localPosition = CubePos;
-            CubeInfo.CubeObject.transform.localRotation = CubeRot;
-
-            DebugLog2Text.text += "\nRemote Cube > "
-                + "\nPosition: " + CubePos.ToString();
+            GameObject.Find("Sharing Cube").transform.position = GameObject.Find("Sharing").transform.TransformPoint(
+                CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
+            /*
+            transform.rotation = Quaternion.Inverse(GameObject.Find("Sharing").transform.rotation) *
+                transform.rotation;
+            */
+            GameObject.Find("Sharing Cube").transform.rotation = Quaternion.Euler(GameObject.Find("Sharing").transform.TransformDirection(
+                CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
+            DebugLog2Text.text += "\nUpdate Cube > " +
+                "\nPosition: " + transform.position.ToString();
         }
 
+        /*
         /// <summary>
         /// Creates a new game object to represent the user's Cube.
         /// </summary>
@@ -201,5 +213,6 @@ namespace HoloToolkit.Sharing.Tests
         {
             DestroyImmediate(remoteCubeObject);
         }
+        */
     }
 }

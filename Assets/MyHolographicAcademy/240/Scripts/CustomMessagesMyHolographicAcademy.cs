@@ -3,15 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using HoloToolkit.Sharing;
 using HoloToolkit.Unity;
 using UnityEngine;
 
-namespace HoloToolkit.Sharing.Tests
+namespace Education.FeelPhysics.MyHolographicAcademy
 {
     /// <summary>
     /// Test class for demonstrating how to send custom messages between clients.
     /// </summary>
-    public class CustomMessages : Singleton<CustomMessages>
+    public class CustomMessagesMyHolographicAcademy : Singleton<CustomMessagesMyHolographicAcademy>
     {
         /// <summary>
         /// Message enum containing our information bytes to share.
@@ -21,6 +22,7 @@ namespace HoloToolkit.Sharing.Tests
         public enum TestMessageID : byte
         {
             HeadTransform = MessageID.UserMessageIDStart,
+            CubeTransform,
             Max
         }
 
@@ -127,6 +129,25 @@ namespace HoloToolkit.Sharing.Tests
             {
                 // Create an outgoing network message to contain all the info we want to send
                 NetworkOutMessage msg = CreateMessage((byte)TestMessageID.HeadTransform);
+
+                AppendTransform(msg, position, rotation);
+
+                // Send the message as a broadcast, which will cause the server to forward it to all other users in the session.
+                serverConnection.Broadcast(
+                    msg,
+                    MessagePriority.Immediate,
+                    MessageReliability.UnreliableSequenced,
+                    MessageChannel.Avatar);
+            }
+        }
+
+        public void SendCubeTransform(Vector3 position, Quaternion rotation)
+        {
+            // If we are connected to a session, broadcast our head info
+            if (serverConnection != null && serverConnection.IsConnected())
+            {
+                // Create an outgoing network message to contain all the info we want to send
+                NetworkOutMessage msg = CreateMessage((byte)TestMessageID.CubeTransform);
 
                 AppendTransform(msg, position, rotation);
 

@@ -21,14 +21,16 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// </summary>
         public enum TestMessageID : byte
         {
-            HeadTransform = MessageID.UserMessageIDStart,
+            HelloMessage = MessageID.UserMessageIDStart,
             Max
         }
 
+        /*
         public enum UserMessageChannels
         {
             Anchors = MessageChannel.UserMessageChannelStart
         }
+        */
 
         /// <summary>
         /// Cache the local user's ID to use when sending messages
@@ -101,7 +103,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             // Cache the local user ID
             LocalUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();
 
-            for (byte index = (byte)TestMessageID.HeadTransform; index < (byte)TestMessageID.Max; index++)
+            for (byte index = (byte)TestMessageID.HelloMessage; index < (byte)TestMessageID.Max; index++)
             {
                 if (MessageHandlers.ContainsKey((TestMessageID)index) == false)
                 {
@@ -127,7 +129,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             if (serverConnection != null && serverConnection.IsConnected())
             {
                 // Create an outgoing network message to contain all the info we want to send
-                NetworkOutMessage msg = CreateMessage((byte)TestMessageID.HeadTransform);
+                NetworkOutMessage msg = CreateMessage((byte)TestMessageID.HelloMessage);
 
                 //AppendTransform(msg, position, rotation);
 
@@ -140,15 +142,17 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
         }
 
-        public void SendHeadTransform(Vector3 position, Quaternion rotation)
+        public void SendHelloMessage(Vector3 position, Quaternion rotation)
         {
             // If we are connected to a session, broadcast our head info
             if (serverConnection != null && serverConnection.IsConnected())
             {
                 // Create an outgoing network message to contain all the info we want to send
-                NetworkOutMessage msg = CreateMessage((byte)TestMessageID.HeadTransform);
+                NetworkOutMessage msg = CreateMessage((byte)TestMessageID.HelloMessage);
 
+                /*
                 AppendTransform(msg, position, rotation);
+                */
 
                 // Send the message as a broadcast, which will cause the server to forward it to all other users in the session.
                 serverConnection.Broadcast(
@@ -165,7 +169,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
             if (serverConnection != null)
             {
-                for (byte index = (byte)TestMessageID.HeadTransform; index < (byte)TestMessageID.Max; index++)
+                for (byte index = (byte)TestMessageID.HelloMessage; index < (byte)TestMessageID.Max; index++)
                 {
                     serverConnection.RemoveListener(index, connectionAdapter);
                 }
@@ -183,6 +187,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
         }
 
+        /*
         #region HelperFunctionsForWriting
 
         private void AppendTransform(NetworkOutMessage msg, Vector3 position, Quaternion rotation)
@@ -221,5 +226,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         }
 
         #endregion
+        */
     }
 }
