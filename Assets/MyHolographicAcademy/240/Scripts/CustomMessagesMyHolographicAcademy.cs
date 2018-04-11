@@ -22,7 +22,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         public enum TestMessageID : byte
         {
             HeadTransform = MessageID.UserMessageIDStart,
-            CubeTransform,
+            MagnetTransform,
             Max
         }
 
@@ -34,10 +34,9 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <summary>
         /// Cache the local user's ID to use when sending messages
         /// </summary>
-        public long LocalUserID
-        {
-            get; set;
-        }
+        public long LocalUserID = 0;
+
+        public long FirstUserID;
 
         public delegate void MessageCallback(NetworkInMessage msg);
         private Dictionary<TestMessageID, MessageCallback> messageHandlers = new Dictionary<TestMessageID, MessageCallback>();
@@ -100,7 +99,11 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             connectionAdapter.MessageReceivedCallback += OnMessageReceived;
 
             // Cache the local user ID
-            LocalUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();
+            //LocalUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();
+            if (LocalUserID == 0)
+            {
+                FirstUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();
+            }
 
             for (byte index = (byte)TestMessageID.HeadTransform; index < (byte)TestMessageID.Max; index++)
             {
@@ -119,6 +122,16 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             msg.Write(messageType);
             // Add the local userID so that the remote clients know whose message they are receiving
             msg.Write(LocalUserID);
+            return msg;
+        }
+
+        private NetworkOutMessage CreateMagnetMessage(byte messageType)
+        {
+            NetworkOutMessage msg = serverConnection.CreateMessage(messageType);
+            msg.Write(messageType);
+            // Add the local userID so that the remote clients know whose message they are receiving
+            //msg.Write(LocalUserID);
+            msg.Write(FirstUserID);
             return msg;
         }
 
@@ -141,13 +154,13 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
         }
 
-        public void SendCubeTransform(Vector3 position, Quaternion rotation)
+        public void SendMagnetTransform(Vector3 position, Quaternion rotation)
         {
             // If we are connected to a session, broadcast our head info
             if (serverConnection != null && serverConnection.IsConnected())
             {
                 // Create an outgoing network message to contain all the info we want to send
-                NetworkOutMessage msg = CreateMessage((byte)TestMessageID.CubeTransform);
+                NetworkOutMessage msg = CreateMagnetMessage((byte)TestMessageID.MagnetTransform);
 
                 AppendTransform(msg, position, rotation);
 

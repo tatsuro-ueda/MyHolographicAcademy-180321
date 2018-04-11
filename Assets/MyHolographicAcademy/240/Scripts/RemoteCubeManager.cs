@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Sharing;
-using HoloToolkit.Unity;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
@@ -15,7 +13,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
     /// and adds and updates the Cube transforms of remote users.
     /// Cube transforms are sent and received in the local coordinate space of the GameObject this component is on.
     /// </summary>
-    public class RemoteCubeManager : Singleton<RemoteCubeManager>
+    public class RemoteCubeManager : MonoBehaviour
     {
         public class RemoteCubeInfo
         {
@@ -33,6 +31,9 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// </summary>
         public TextMesh DebugLog2Text;
 
+        [Tooltip("Sharingプレハブをヒエラルキービューに入れたもの")]
+        public GameObject SharingPrefabObject;
+
         /// <summary>
         /// Keep a list of the remote Cubes, indexed by XTools userID
         /// </summary>
@@ -41,7 +42,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         private void Start()
         {
             CustomMessagesMyHolographicAcademy.Instance.MessageHandlers
-                [CustomMessagesMyHolographicAcademy.TestMessageID.CubeTransform] = UpdateCubeTransform;
+                [CustomMessagesMyHolographicAcademy.TestMessageID.MagnetTransform] = UpdateCubeTransform;
             //CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateCubeTransform;
             DebugLogText.text += "\n[Cube] Set UpdateCubeTransform as MessageHandlers";
 
@@ -69,36 +70,51 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void Update()
         {
-            /*
-            // Grab the current Cube transform and broadcast it to all the other users in the session
-            Transform CubeTransform = CameraCache.Main.transform;
+            if (transform.hasChanged)
+            {
+                /*
+                // Grab the current Cube transform and broadcast it to all the other users in the session
+                Transform CubeTransform = CameraCache.Main.transform;
 
-            // Transform the Cube position and rotation from world space into local space
-            Vector3 CubePosition = transform.InverseTransformPoint(CubeTransform.position);
-            Quaternion CubeRotation = Quaternion.Inverse(transform.rotation) * CubeTransform.rotation;
-            CustomMessages.Instance.SendHeadTransform(CubePosition, CubeRotation);
+                // Transform the Cube position and rotation from world space into local space
+                Vector3 CubePosition = transform.InverseTransformPoint(CubeTransform.position);
+                Quaternion CubeRotation = Quaternion.Inverse(transform.rotation) * CubeTransform.rotation;
+                CustomMessages.Instance.SendHeadTransform(CubePosition, CubeRotation);
 
-            DebugLog2Text.text = "\nHead > "
-                + "\nPosition: " + CubeTransform.position.ToString()
-                + "\nCube > "
-                + "\nPosition: " + Cube2Transform.position.ToString();
-            */
+                DebugLog2Text.text = "\nHead > "
+                    + "\nPosition: " + CubeTransform.position.ToString()
+                    + "\nCube > "
+                    + "\nPosition: " + Cube2Transform.position.ToString();
+                */
 
-            // Transform the head position and rotation from world space into local space
-            Vector3 cubePosition = GameObject.Find("Sharing").transform.
-                InverseTransformPoint(GameObject.Find("Sharing Cube").transform.position);
-            /*
-            Quaternion cubeRotation = Quaternion.Inverse(transform.rotation) *
-                GameObject.Find("Sharing").transform.rotation;
-            */
-            Quaternion cubeRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
-                InverseTransformDirection(GameObject.Find("Sharing Cube").transform.eulerAngles));
-            CustomMessagesMyHolographicAcademy.Instance.SendCubeTransform(cubePosition, cubeRotation);
-            DebugLog2Text.text = "\nSend Cube > " +
-                "\nPosition: " + cubePosition.ToString();
+                // Transform the head position and rotation from world space into local space
+                Vector3 cubePosition = SharingPrefabObject.transform.
+                    InverseTransformPoint(transform.position);
+                /*
+                Vector3 cubePosition = GameObject.Find("Sharing").transform.
+                    InverseTransformPoint(transform.position);
+                */
+                /*
+                Quaternion cubeRotation = Quaternion.Inverse(transform.rotation) *
+                    GameObject.Find("Sharing").transform.rotation;
+                */
+                /*
+                Quaternion cubeRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
+                    InverseTransformDirection(GameObject.Find("Sharing Cube").transform.eulerAngles));
+                */
+                Quaternion cubeRotation = Quaternion.Euler(SharingPrefabObject.transform.
+                    InverseTransformDirection(transform.eulerAngles));
+                CustomMessagesMyHolographicAcademy.Instance.SendMagnetTransform(cubePosition, cubeRotation);
+                DebugLog2Text.text = "\nSend Cube > " +
+                    "\nPosition: " + cubePosition.ToString();
+            }
+            else
+            {
+                DebugLog2Text.text = "\nSend Cube > " + "\nPosition: not changed";
+            }
         }
 
-        protected override void OnDestroy()
+        protected void OnDestroy()
         {
             if (SharingStage.Instance != null)
             {
@@ -178,14 +194,22 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             // Parse the message
             long userID = msg.ReadInt64();
 
-            GameObject.Find("Sharing Cube").transform.position = GameObject.Find("Sharing").transform.TransformPoint(
+            transform.position = SharingPrefabObject.transform.TransformPoint(
                 CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
+            /*
+            transform.position = GameObject.Find("Sharing").transform.TransformPoint(
+                CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
+            */
             /*
             transform.rotation = Quaternion.Inverse(GameObject.Find("Sharing").transform.rotation) *
                 transform.rotation;
             */
-            GameObject.Find("Sharing Cube").transform.rotation = Quaternion.Euler(GameObject.Find("Sharing").transform.TransformDirection(
+            transform.rotation = Quaternion.Euler(SharingPrefabObject.transform.TransformDirection(
                 CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
+            /*
+            transform.rotation = Quaternion.Euler(GameObject.Find("Sharing").transform.TransformDirection(
+                CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
+            */
             DebugLog2Text.text += "\nUpdate Cube > " +
                 "\nPosition: " + transform.position.ToString();
         }
