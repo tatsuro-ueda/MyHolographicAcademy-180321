@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using HoloToolkit.Sharing;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using HoloToolkit.Sharing;
-using HoloToolkit.Unity;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
@@ -40,6 +39,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// </summary>
         private Dictionary<long, RemoteMagnetInfo> remoteMagnets = new Dictionary<long, RemoteMagnetInfo>();
 
+        private bool hasUpdatedbyRemote;
+
+        private Transform previousTransform;
+
         private void Start()
         {
             CustomMessagesMyHolographicAcademy.Instance.MessageHandlers
@@ -71,48 +74,63 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void Update()
         {
-            if (transform.hasChanged)
+            if (previousTransform != null)
             {
-                /*
-                // Grab the current Magnet transform and broadcast it to all the other users in the session
-                Transform MagnetTransform = CameraCache.Main.transform;
+                DebugLog2Text.text = "\nPrevious position: " + previousTransform.position.ToString() +
+                    "\nPresent position: " + transform.position.ToString() +
+                    "\ntransform.hasChanged: " + transform.hasChanged.ToString();
+            }
 
-                // Transform the Magnet position and rotation from world space into local space
-                Vector3 MagnetPosition = transform.InverseTransformPoint(MagnetTransform.position);
-                Quaternion MagnetRotation = Quaternion.Inverse(transform.rotation) * MagnetTransform.rotation;
-                CustomMessages.Instance.SendHeadTransform(MagnetPosition, MagnetRotation);
+            /*
+            if (!hasUpdatedbyRemote)
+            {
+            */
+            /*
+            // Grab the current Magnet transform and broadcast it to all the other users in the session
+            Transform MagnetTransform = CameraCache.Main.transform;
 
-                DebugLog2Text.text = "\nHead > "
-                    + "\nPosition: " + MagnetTransform.position.ToString()
-                    + "\nMagnet > "
-                    + "\nPosition: " + Magnet2Transform.position.ToString();
-                */
+            // Transform the Magnet position and rotation from world space into local space
+            Vector3 MagnetPosition = transform.InverseTransformPoint(MagnetTransform.position);
+            Quaternion MagnetRotation = Quaternion.Inverse(transform.rotation) * MagnetTransform.rotation;
+            CustomMessages.Instance.SendHeadTransform(MagnetPosition, MagnetRotation);
 
-                // Transform the head position and rotation from world space into local space
-                Vector3 MagnetPosition = SharingPrefabObject.transform.
+            DebugLog2Text.text = "\nHead > "
+                + "\nPosition: " + MagnetTransform.position.ToString()
+                + "\nMagnet > "
+                + "\nPosition: " + Magnet2Transform.position.ToString();
+            */
+
+            // Transform the head position and rotation from world space into local space
+            Vector3 MagnetPosition = SharingPrefabObject.transform.
                     InverseTransformPoint(transform.position);
-                /*
-                Vector3 MagnetPosition = GameObject.Find("Sharing").transform.
-                    InverseTransformPoint(transform.position);
-                */
-                /*
-                Quaternion MagnetRotation = Quaternion.Inverse(transform.rotation) *
-                    GameObject.Find("Sharing").transform.rotation;
-                */
-                /*
-                Quaternion MagnetRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
-                    InverseTransformDirection(GameObject.Find("Sharing Magnet").transform.eulerAngles));
-                */
-                Quaternion MagnetRotation = Quaternion.Euler(SharingPrefabObject.transform.
-                    InverseTransformDirection(transform.eulerAngles));
-                CustomMessagesMyHolographicAcademy.Instance.SendMagnetTransform(MagnetPosition, MagnetRotation);
-                DebugLog2Text.text = "\nSend Magnet > " +
-                    "\nPosition: " + MagnetPosition.ToString();
+            /*
+            Vector3 MagnetPosition = GameObject.Find("Sharing").transform.
+                InverseTransformPoint(transform.position);
+            */
+            /*
+            Quaternion MagnetRotation = Quaternion.Inverse(transform.rotation) *
+                GameObject.Find("Sharing").transform.rotation;
+            */
+            /*
+            Quaternion MagnetRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
+                InverseTransformDirection(GameObject.Find("Sharing Magnet").transform.eulerAngles));
+            */
+            Quaternion MagnetRotation = Quaternion.Euler(SharingPrefabObject.transform.
+                InverseTransformDirection(transform.eulerAngles));
+            CustomMessagesMyHolographicAcademy.Instance.SendMagnetTransform(MagnetPosition, MagnetRotation);
+            DebugLog2Text.text += "\nSend Magnet > " +
+                "\nPosition: " + MagnetPosition.ToString();
+
+            hasUpdatedbyRemote = false;
+            previousTransform = transform;
+            /*
             }
             else
             {
-                DebugLog2Text.text = "\nSend Magnet > " + "\nPosition: not changed";
+                DebugLog2Text.text = "\nSend Magnet > " + "\nPosition: has updated";
+                hasUpdatedbyRemote = false;
             }
+            */
         }
 
         protected void OnDestroy()
@@ -192,6 +210,8 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="msg"></param>
         private void UpdateMagnetTransform(NetworkInMessage msg)
         {
+            hasUpdatedbyRemote = true;
+
             // Parse the message
             long userID = msg.ReadInt64();
 

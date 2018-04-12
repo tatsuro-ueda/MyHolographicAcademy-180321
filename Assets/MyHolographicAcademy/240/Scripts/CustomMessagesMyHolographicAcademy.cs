@@ -34,9 +34,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <summary>
         /// Cache the local user's ID to use when sending messages
         /// </summary>
-        public long LocalUserID = 0;
-
-        public long FirstUserID;
+        public long LocalUserID { get; set; }
 
         public delegate void MessageCallback(NetworkInMessage msg);
         private Dictionary<TestMessageID, MessageCallback> messageHandlers = new Dictionary<TestMessageID, MessageCallback>();
@@ -99,11 +97,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             connectionAdapter.MessageReceivedCallback += OnMessageReceived;
 
             // Cache the local user ID
-            //LocalUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();
-            if (LocalUserID == 0)
-            {
-                FirstUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();
-            }
+            LocalUserID = SharingStage.Instance.Manager.GetLocalUser().GetID();            
 
             for (byte index = (byte)TestMessageID.HeadTransform; index < (byte)TestMessageID.Max; index++)
             {
@@ -130,8 +124,8 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             NetworkOutMessage msg = serverConnection.CreateMessage(messageType);
             msg.Write(messageType);
             // Add the local userID so that the remote clients know whose message they are receiving
-            //msg.Write(LocalUserID);
-            msg.Write(FirstUserID);
+            msg.Write(LocalUserID);
+
             return msg;
         }
 
