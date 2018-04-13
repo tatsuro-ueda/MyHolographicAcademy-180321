@@ -99,30 +99,35 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 + "\nMagnet > "
                 + "\nPosition: " + Magnet2Transform.position.ToString();
             */
-
-            // Transform the head position and rotation from world space into local space
-            Vector3 MagnetPosition = SharingPrefabObject.transform.
+            if (transform.hasChanged)
+            {
+                // Transform the head position and rotation from world space into local space
+                Vector3 MagnetPositionFromSharingPrefab = SharingPrefabObject.transform.
+                        InverseTransformPoint(transform.position);
+                /*
+                Vector3 MagnetPosition = GameObject.Find("Sharing").transform.
                     InverseTransformPoint(transform.position);
-            /*
-            Vector3 MagnetPosition = GameObject.Find("Sharing").transform.
-                InverseTransformPoint(transform.position);
-            */
-            /*
-            Quaternion MagnetRotation = Quaternion.Inverse(transform.rotation) *
-                GameObject.Find("Sharing").transform.rotation;
-            */
-            /*
-            Quaternion MagnetRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
-                InverseTransformDirection(GameObject.Find("Sharing Magnet").transform.eulerAngles));
-            */
-            Quaternion MagnetRotation = Quaternion.Euler(SharingPrefabObject.transform.
-                InverseTransformDirection(transform.eulerAngles));
-            CustomMessagesMyHolographicAcademy.Instance.SendMagnetTransform(MagnetPosition, MagnetRotation);
-            DebugLog2Text.text += "\nSend Magnet > " +
-                "\nPosition: " + MagnetPosition.ToString();
+                */
+                /*
+                Quaternion MagnetRotation = Quaternion.Inverse(transform.rotation) *
+                    GameObject.Find("Sharing").transform.rotation;
+                */
+                /*
+                Quaternion MagnetRotation = Quaternion.Euler(GameObject.Find("Sharing").transform.
+                    InverseTransformDirection(GameObject.Find("Sharing Magnet").transform.eulerAngles));
+                */
+                Quaternion MagnetRotationFromSharingPrefabObject =
+                    Quaternion.Euler(SharingPrefabObject.transform.InverseTransformDirection(
+                        transform.eulerAngles));
+                CustomMessagesMyHolographicAcademy.Instance.SendMagnetTransform(
+                    MagnetPositionFromSharingPrefab, MagnetRotationFromSharingPrefabObject);
+                DebugLog2Text.text += "\nSendMagnetTransform > " +
+                    "\nMagnetPositionFromSharingPrefab: " + MagnetPositionFromSharingPrefab.ToString();
 
-            hasUpdatedbyRemote = false;
+                hasUpdatedbyRemote = false;
+            }
             previousTransform = transform;
+            transform.hasChanged = false;
             /*
             }
             else
@@ -131,6 +136,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 hasUpdatedbyRemote = false;
             }
             */
+        }
+
+        private void LateUpdate()
+        {
         }
 
         protected void OnDestroy()
@@ -151,7 +160,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="user">User that left the current session.</param>
         private void UserLeftSession(User user)
         {
-            DebugLogText.text += "\n[Magnet] UserLeftSession > User ID: " + user.GetID().ToString();
+            DebugLogText.text += "\n[Magnet] UserLeftSession(User user) > user.GetID(): " + user.GetID().ToString();
             /*
             int userId = user.GetID();
             if (userId != SharingStage.Instance.Manager.GetLocalUser().GetID())
@@ -168,8 +177,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="user">User that joined the current session.</param>
         private void UserJoinedSession(User user)
         {
-            DebugLogText.text += "\n[Magnet] UserJoinedSession > User ID: " + user.GetID().ToString();
-            DebugLogText.text += "\n[Magnet] UserJoinedSession > Local user ID: " + 
+            DebugLogText.text += "\n[Magnet] UserJoinedSession(User user) > user.GetID(): " + 
+                user.GetID().ToString();
+            DebugLogText.text += "\n[Magnet] UserJoinedSession(User user) > " +
+                "SharingStage.Instance.Manager.GetLocalUser().GetID(): " + 
                 SharingStage.Instance.Manager.GetLocalUser().GetID().ToString();
             if (user.GetID() != SharingStage.Instance.Manager.GetLocalUser().GetID())
             {
@@ -210,31 +221,34 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="msg"></param>
         private void UpdateMagnetTransform(NetworkInMessage msg)
         {
-            hasUpdatedbyRemote = true;
+            if (!transform.hasChanged)
+            {
+                hasUpdatedbyRemote = true;
 
-            // Parse the message
-            long userID = msg.ReadInt64();
+                // Parse the message
+                long userID = msg.ReadInt64();
 
-            transform.position = SharingPrefabObject.transform.TransformPoint(
-            CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
-            /*
-            transform.position = GameObject.Find("Sharing").transform.TransformPoint(
+                transform.position = SharingPrefabObject.transform.TransformPoint(
                 CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
-            */
-            /*
-            transform.rotation = Quaternion.Inverse(GameObject.Find("Sharing").transform.rotation) *
-                transform.rotation;
-            */
-            transform.rotation = Quaternion.Euler(SharingPrefabObject.transform.TransformDirection(
-                CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
-            /*
-            transform.rotation = Quaternion.Euler(GameObject.Find("Sharing").transform.TransformDirection(
-                CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
-            DebugLog2Text.text += "\nUpdate Magnet > " +
-                "\nPosition: " + transform.position.ToString();
-            */
-            DebugLog2Text.text += "\nUpdate Magnet > " +
-                "\nuserID: " + userID.ToString();
+                /*
+                transform.position = GameObject.Find("Sharing").transform.TransformPoint(
+                    CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
+                */
+                /*
+                transform.rotation = Quaternion.Inverse(GameObject.Find("Sharing").transform.rotation) *
+                    transform.rotation;
+                */
+                transform.rotation = Quaternion.Euler(SharingPrefabObject.transform.TransformDirection(
+                    CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
+                /*
+                transform.rotation = Quaternion.Euler(GameObject.Find("Sharing").transform.TransformDirection(
+                    CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
+                DebugLog2Text.text += "\nUpdate Magnet > " +
+                    "\nPosition: " + transform.position.ToString();
+                */
+                DebugLog2Text.text += "\nNetworkInMessage msg > " +
+                    "\nuserID: " + userID.ToString();
+            }
         }
 
         /*

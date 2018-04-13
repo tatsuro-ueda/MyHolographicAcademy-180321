@@ -366,6 +366,7 @@ GameObject:
   - component: {fileID: 1420399634}
   - component: {fileID: 1420399638}
   - component: {fileID: 1420399639}
+  - component: {fileID: 1420399640}
   m_Layer: 0
   m_Name: Sharing Magnet
   m_TagString: Untagged
@@ -459,9 +460,26 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1420399633}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d5a0a60fbe897549ad0bfe2039f12b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HostTransform: {fileID: 0}
+  DistanceScale: 2
+  RotationMode: 0
+  PositionLerpSpeed: 0.2
+  RotationLerpSpeed: 0.2
+  IsDraggingEnabled: 1
+--- !u!114 &1420399640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1420399633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 837507a04acae8349b43493130130b6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   HostTransform: {fileID: 0}
@@ -517,7 +535,7 @@ Prefab:
     - target: {fileID: 114000012667812730, guid: 8aaf37823b26ee449bb3b3d7775965c3,
         type: 2}
       propertyPath: ServerAddress
-      value: 172.25.14.4
+      value: 192.168.55.39
       objectReference: {fileID: 0}
     - target: {fileID: 114835164397381706, guid: 8aaf37823b26ee449bb3b3d7775965c3,
         type: 2}
@@ -579,8 +597,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7a63ef1b98adec49bdb80fe1f187893, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LocalUserID: 0
-  FirstUserID: 0
 --- !u!114 &1498985652
 MonoBehaviour:
   m_ObjectHideFlags: 0
