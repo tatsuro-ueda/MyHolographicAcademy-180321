@@ -29,7 +29,7 @@ public class MyDraggable : MonoBehaviour, IManipulationHandler
 
     public void OnManipulationUpdated(ManipulationEventData eventData)
     {
-        transform.position = positionOnManipulationStarted + eventData.CumulativeDelta;
+        transform.position = positionOnManipulationStarted + eventData.CumulativeDelta * 2f;
     }
 
     // Use this for initialization

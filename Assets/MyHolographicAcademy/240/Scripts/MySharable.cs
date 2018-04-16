@@ -99,7 +99,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 + "\nMagnet > "
                 + "\nPosition: " + Magnet2Transform.position.ToString();
             */
-            if (transform.hasChanged)
+            if (transform.hasChanged && !hasUpdatedbyRemote)
             {
                 // Transform the head position and rotation from world space into local space
                 Vector3 MagnetPositionFromSharingPrefab = SharingPrefabObject.transform.
@@ -123,11 +123,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                     MagnetPositionFromSharingPrefab, MagnetRotationFromSharingPrefabObject);
                 DebugLog2Text.text += "\nSendMagnetTransform > " +
                     "\nMagnetPositionFromSharingPrefab: " + MagnetPositionFromSharingPrefab.ToString();
-
-                hasUpdatedbyRemote = false;
             }
             previousTransform = transform;
             transform.hasChanged = false;
+            hasUpdatedbyRemote = false;
             /*
             }
             else
@@ -221,7 +220,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="msg"></param>
         private void UpdateMagnetTransform(NetworkInMessage msg)
         {
-            if (!transform.hasChanged)
+            if (!transform.hasChanged && !hasUpdatedbyRemote)
             {
                 hasUpdatedbyRemote = true;
 
