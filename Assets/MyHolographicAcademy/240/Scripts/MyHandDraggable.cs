@@ -8,7 +8,7 @@ namespace HoloToolkit.Unity.InputModule
 {
     /// <summary>
     /// HoloLens上のオブジェクトを手でドラッグすることができるようにするコンポーネントです。
-    /// 現在と直前の手の位置の角度とz座標の変化を計算し、
+    /// 現在と直前の手の位置の角度とz座標（前後）の変化を計算し、
     /// そこにオブジェクトを配置することで、ドラッグを実現しています。
     /// </summary>
     public class MyHandDraggable : MonoBehaviour, IFocusable, IInputHandler, ISourceStateHandler
@@ -26,7 +26,7 @@ namespace HoloToolkit.Unity.InputModule
         [Tooltip("ドラッグされるTransform。デフォルトでは、このコンポーネントを含むオブジェクト")]
         public Transform HostTransform;
 
-        [Tooltip("z軸に沿った手の移動の何倍だけドラッグするオブジェクトを動かすかの縮尺")]
+        [Tooltip("z軸に沿った手の移動の何倍だけドラッグするオブジェクトを動かすかの倍率")]
         public float DistanceScale = 2f;
 
         public enum RotationModeEnum
@@ -54,7 +54,15 @@ namespace HoloToolkit.Unity.InputModule
         private Vector3 objRefForward;
         private Vector3 objRefUp;
         private float objRefDistance;
+
+        /// <summary>
+        /// 手とオブジェクトのあいだの最初の回転の差分
+        /// </summary>
         private Quaternion gazeAngularOffset;
+
+        /// <summary>
+        /// つかんだときの基点と手とのあいだの距離
+        /// </summary>
         private float handRefDistance;
         private Vector3 objRefGrabPoint;
 
@@ -136,13 +144,13 @@ namespace HoloToolkit.Unity.InputModule
             currentInputSource.TryGetPointerPosition(currentInputSourceId, out inputPosition);
 #endif
 
-            // 自身（pivot）の位置を取得する
+            // 基点の位置を取得する
             Vector3 pivotPosition = GetHandPivotPosition(cameraTransform);
 
-            // 自身と手とのあいだの距離
+            // つかんだときの基点と手とのあいだの距離
             handRefDistance = Vector3.Magnitude(inputPosition - pivotPosition);
 
-            // 自身とオブジェクトのあいだの距離
+            // 基点とオブジェクトのあいだの距離
             objRefDistance = Vector3.Magnitude(initialDraggingPosition - pivotPosition);
 
             Vector3 objForward = HostTransform.forward;
@@ -162,7 +170,7 @@ namespace HoloToolkit.Unity.InputModule
             objRefForward = objForward;
             objRefUp = objUp;
 
-            // 手とオブジェクトのあいだの最初の位置の差分を保持する
+            // 手とオブジェクトのあいだの最初の回転の差分を保持する
             // これによりドラッグ中にこれを考慮できる
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
             draggingPosition = initialDraggingPosition;
@@ -171,9 +179,9 @@ namespace HoloToolkit.Unity.InputModule
         }
 
         /// <summary>
-        /// 自身の位置（首の根元辺り）を取得する
+        /// 基点の位置（首の根元辺り）を取得する
         /// </summary>
-        /// <returns>自身の位置</returns>
+        /// <returns>基点の位置</returns>
         private Vector3 GetHandPivotPosition(Transform cameraTransform)
         {
             // カメラよりも若干下で後ろ
@@ -200,12 +208,13 @@ namespace HoloToolkit.Unity.InputModule
         }
 
         /// <summary>
-        /// Update the position of the object being dragged.
+        /// ドラッグされているオブジェクトの位置を更新する
         /// </summary>
         private void UpdateDragging()
         {
             Transform cameraTransform = CameraCache.Main.transform;
 
+            // 手もしくはコントローラーの位置を取得する
             Vector3 inputPosition = Vector3.zero;
 #if UNITY_2017_2_OR_NEWER
             InteractionSourceInfo sourceKind;
@@ -223,22 +232,36 @@ namespace HoloToolkit.Unity.InputModule
             currentInputSource.TryGetPointerPosition(currentInputSourceId, out inputPosition);
 #endif
 
+            // 基点をの位置を取得する
             Vector3 pivotPosition = GetHandPivotPosition(cameraTransform);
 
+            // --- 新しい位置を計算する、ここから ---
+            // 新しい、基点から見た手の位置
             Vector3 newHandDirection = Vector3.Normalize(inputPosition - pivotPosition);
 
-            newHandDirection = cameraTransform.InverseTransformDirection(newHandDirection); // in camera space
+            // カメラ空間での手の方向
+            newHandDirection = cameraTransform.InverseTransformDirection(newHandDirection);
+
+            // 手とオブジェクトのあいだの最初の回転の差分
             Vector3 targetDirection = Vector3.Normalize(gazeAngularOffset * newHandDirection);
-            targetDirection = cameraTransform.TransformDirection(targetDirection); // back to world space
+            
+            // 世界空間に戻す
+            targetDirection = cameraTransform.TransformDirection(targetDirection);
 
             float currentHandDistance = Vector3.Magnitude(inputPosition - pivotPosition);
 
+            // 現在の基点と手とのあいだの距離／つかんだときの基点と手とのあいだの距離
+            // 手前でつかむほど大きく前後に動かすことができる
             float distanceRatio = currentHandDistance / handRefDistance;
+
+            // public変数のDistanceScale（z軸に沿った手の移動の何倍だけドラッグするオブジェクトを動かすかの倍率）を反映させる
             float distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * DistanceScale : 0;
             float targetDistance = objRefDistance + distanceOffset;
 
             draggingPosition = pivotPosition + (targetDirection * targetDistance);
+            // --- 新しい位置を計算する、ここまで ---
 
+            // --- 新しい回転を計算する、ここから ---
             if (RotationMode == RotationModeEnum.OrientTowardUser || RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright)
             {
                 draggingRotation = Quaternion.LookRotation(HostTransform.position - pivotPosition);
@@ -253,9 +276,11 @@ namespace HoloToolkit.Unity.InputModule
                 Vector3 objUp = cameraTransform.TransformDirection(objRefUp);           // in world space
                 draggingRotation = Quaternion.LookRotation(objForward, objUp);
             }
+            // --- 新しい回転を計算する、ここまで ---
 
+            // --- 新しい位置・回転を適用する、ここから ---
             Vector3 newPosition = Vector3.Lerp(HostTransform.position, draggingPosition + cameraTransform.TransformDirection(objRefGrabPoint), PositionLerpSpeed);
-            // Apply Final Position
+            // 最終的な位置を適用する
             if (hostRigidbody == null)
             {
                 HostTransform.position = newPosition;
@@ -265,7 +290,7 @@ namespace HoloToolkit.Unity.InputModule
                 hostRigidbody.MovePosition(newPosition);
             }
 
-            // Apply Final Rotation
+            // 最終的な回転を適用する
             Quaternion newRotation = Quaternion.Lerp(HostTransform.rotation, draggingRotation, RotationLerpSpeed);
             if (hostRigidbody == null)
             {
@@ -281,10 +306,11 @@ namespace HoloToolkit.Unity.InputModule
                 Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);
                 HostTransform.rotation = upRotation * HostTransform.rotation;
             }
+            // --- 新しい位置・回転を適用する、ここまで ---
         }
 
         /// <summary>
-        /// Stops dragging the object.
+        /// オブジェクトのドラッグを止める
         /// </summary>
         public void StopDragging()
         {
@@ -293,7 +319,7 @@ namespace HoloToolkit.Unity.InputModule
                 return;
             }
 
-            // Remove self as a modal input handler
+            // モーダル入力対象から自身を削除する
             InputManager.Instance.PopModalInputHandler();
 
             isDragging = false;
@@ -337,7 +363,7 @@ namespace HoloToolkit.Unity.InputModule
             if (currentInputSource != null &&
                 eventData.SourceId == currentInputSourceId)
             {
-                eventData.Use(); // Mark the event as used, so it doesn't fall through to other handlers.
+                eventData.Use(); // イベントが使われたことを記録して、他の処理に受け取られるのを防ぐ
 
                 StopDragging();
             }
@@ -347,7 +373,7 @@ namespace HoloToolkit.Unity.InputModule
         {
             if (isDragging)
             {
-                // We're already handling drag input, so we can't start a new drag operation.
+                // すでにドラッグの入力を受け取って処理しているので、新しいドラッグ操作は開始しない
                 return;
             }
 
