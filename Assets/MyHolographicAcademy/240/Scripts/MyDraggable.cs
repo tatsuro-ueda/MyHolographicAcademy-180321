@@ -7,6 +7,7 @@ public class MyDraggable : MonoBehaviour, IManipulationHandler
     public TextMesh DebugLog;
 
     private Vector3 positionOnManipulationStarted;
+    //private Vector3 positionOnManipulationUpdated;
 
     public void OnManipulationCanceled(ManipulationEventData eventData)
     {
@@ -29,6 +30,13 @@ public class MyDraggable : MonoBehaviour, IManipulationHandler
 
     public void OnManipulationUpdated(ManipulationEventData eventData)
     {
+        /*
+        positionOnManipulationUpdated = Vector3.Lerp(
+            positionOnManipulationStarted + eventData.CumulativeDelta * 2f,
+            positionOnManipulationUpdated, 0.2f);
+        transform.position = positionOnManipulationUpdated;
+        */
+
         transform.position = positionOnManipulationStarted + eventData.CumulativeDelta * 2f;
     }
 

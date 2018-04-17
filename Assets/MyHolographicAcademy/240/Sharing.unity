@@ -367,6 +367,7 @@ GameObject:
   - component: {fileID: 1420399638}
   - component: {fileID: 1420399639}
   - component: {fileID: 1420399640}
+  - component: {fileID: 1420399641}
   m_Layer: 0
   m_Name: Sharing Magnet
   m_TagString: Untagged
@@ -488,6 +489,18 @@ MonoBehaviour:
   PositionLerpSpeed: 0.2
   RotationLerpSpeed: 0.2
   IsDraggingEnabled: 1
+--- !u!114 &1420399641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1420399633}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ab781018ebd24a47a49f2c79e65a235, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugLog: {fileID: 0}
 --- !u!1001 &1498985646
 Prefab:
   m_ObjectHideFlags: 0

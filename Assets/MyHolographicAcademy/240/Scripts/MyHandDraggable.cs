@@ -1,51 +1,49 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
-using HoloToolkit.Unity;
-using HoloToolkit.Unity.InputModule;
 using UnityEngine;
+using System;
 
-namespace Education.FeelPhysics.MyHolographicAcademy
+namespace HoloToolkit.Unity.InputModule
 {
     /// <summary>
-    /// Component that allows dragging an object with your hand on HoloLens.
-    /// Dragging is done by calculating the angular delta and z-delta between the current and previous hand positions,
-    /// and then repositioning the object based on that.
+    /// HoloLens上のオブジェクトを手でドラッグすることができるようにするコンポーネントです。
+    /// 現在と直前の手の位置の角度とz座標の変化を計算し、
+    /// そこにオブジェクトを配置することで、ドラッグを実現しています。
     /// </summary>
-    public class MyHandDraggable : MonoBehaviour, IInputHandler, ISourceStateHandler//, IFocusable
+    public class MyHandDraggable : MonoBehaviour, IFocusable, IInputHandler, ISourceStateHandler
     {
         /// <summary>
-        /// Event triggered when dragging starts.
+        /// ドラッグが始まったときに引き起こされるイベント
         /// </summary>
         public event Action StartedDragging;
 
         /// <summary>
-        /// Event triggered when dragging stops.
+        /// ドラッグが止まったときに引き起こされるイベント
         /// </summary>
         public event Action StoppedDragging;
 
-        [Tooltip("Transform that will be dragged. Defaults to the object of the component.")]
+        [Tooltip("ドラッグされるTransform。デフォルトでは、このコンポーネントを含むオブジェクト")]
         public Transform HostTransform;
 
-        [Tooltip("Scale by which hand movement in z is multiplied to move the dragged object.")]
+        [Tooltip("z軸に沿った手の移動の何倍だけドラッグするオブジェクトを動かすかの縮尺")]
         public float DistanceScale = 2f;
 
         public enum RotationModeEnum
         {
             Default,
-            LockObjectRotation,
-            OrientTowardUser,
+            LockObjectRotation,  // Rotation固定
+            OrientTowardUser,  // ユーザの方を向く
             OrientTowardUserAndKeepUpright
         }
 
         public RotationModeEnum RotationMode = RotationModeEnum.Default;
 
-        [Tooltip("Controls the speed at which the object will interpolate toward the desired position")]
+        [Tooltip("オブジェクトが目標位置まで補間される速さ")]
         [Range(0.01f, 1.0f)]
         public float PositionLerpSpeed = 0.2f;
 
-        [Tooltip("Controls the speed at which the object will interpolate toward the desired rotation")]
+        [Tooltip("オブジェクトが目標角度まで補間される速さ")]
         [Range(0.01f, 1.0f)]
         public float RotationLerpSpeed = 0.2f;
 
@@ -75,8 +73,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             }
 
             hostRigidbody = HostTransform.GetComponent<Rigidbody>();
-
-            isGazed = true;
         }
 
         private void OnDestroy()
@@ -88,7 +84,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
             if (isGazed)
             {
-                //OnFocusExit();
+                OnFocusExit();
             }
         }
 
@@ -101,7 +97,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         }
 
         /// <summary>
-        /// Starts dragging the object.
+        /// オブジェクトのドラッグを開始する
         /// </summary>
         public void StartDragging(Vector3 initialDraggingPosition)
         {
@@ -115,16 +111,14 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 return;
             }
 
-            // TODO: robertes: Fix push/pop and single-handler model so that multiple HandDraggable components
-            //       can be active at once.
-
-            // Add self as a modal input handler, to get all inputs during the manipulation
+            // マニピュレーションのあいだのすべての入力を取得するため、自身をモーダル入力対象に追加する
             InputManager.Instance.PushModalInputHandler(gameObject);
 
             isDragging = true;
 
             Transform cameraTransform = CameraCache.Main.transform;
 
+            // 手もしくはコントローラーの位置を取得する
             Vector3 inputPosition = Vector3.zero;
 #if UNITY_2017_2_OR_NEWER
             InteractionSourceInfo sourceKind;
@@ -142,27 +136,34 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             currentInputSource.TryGetPointerPosition(currentInputSourceId, out inputPosition);
 #endif
 
+            // 自身（pivot）の位置を取得する
             Vector3 pivotPosition = GetHandPivotPosition(cameraTransform);
+
+            // 自身と手とのあいだの距離
             handRefDistance = Vector3.Magnitude(inputPosition - pivotPosition);
+
+            // 自身とオブジェクトのあいだの距離
             objRefDistance = Vector3.Magnitude(initialDraggingPosition - pivotPosition);
 
             Vector3 objForward = HostTransform.forward;
             Vector3 objUp = HostTransform.up;
-            // Store where the object was grabbed from
+
+            // オブジェクトがつかまれた場所を保持する
             objRefGrabPoint = cameraTransform.transform.InverseTransformDirection(HostTransform.position - initialDraggingPosition);
 
             Vector3 objDirection = Vector3.Normalize(initialDraggingPosition - pivotPosition);
             Vector3 handDirection = Vector3.Normalize(inputPosition - pivotPosition);
 
-            objForward = cameraTransform.InverseTransformDirection(objForward);       // in camera space
-            objUp = cameraTransform.InverseTransformDirection(objUp);                 // in camera space
-            objDirection = cameraTransform.InverseTransformDirection(objDirection);   // in camera space
-            handDirection = cameraTransform.InverseTransformDirection(handDirection); // in camera space
+            objForward = cameraTransform.InverseTransformDirection(objForward);       // カメラ空間での
+            objUp = cameraTransform.InverseTransformDirection(objUp);                 // カメラ空間での
+            objDirection = cameraTransform.InverseTransformDirection(objDirection);   // カメラ空間での
+            handDirection = cameraTransform.InverseTransformDirection(handDirection); // カメラ空間での
 
             objRefForward = objForward;
             objRefUp = objUp;
 
-            // Store the initial offset between the hand and the object, so that we can consider it when dragging
+            // 手とオブジェクトのあいだの最初の位置の差分を保持する
+            // これによりドラッグ中にこれを考慮できる
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
             draggingPosition = initialDraggingPosition;
 
@@ -170,18 +171,19 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         }
 
         /// <summary>
-        /// Gets the pivot position for the hand, which is approximated to the base of the neck.
+        /// 自身の位置（首の根元辺り）を取得する
         /// </summary>
-        /// <returns>Pivot position for the hand.</returns>
+        /// <returns>自身の位置</returns>
         private Vector3 GetHandPivotPosition(Transform cameraTransform)
         {
-            return cameraTransform.position + new Vector3(0, -0.2f, 0) - cameraTransform.forward * 0.2f; // a bit lower and behind
+            // カメラよりも若干下で後ろ
+            return cameraTransform.position + new Vector3(0, -0.2f, 0) - cameraTransform.forward * 0.2f;
         }
 
         /// <summary>
-        /// Enables or disables dragging.
+        /// ドラッグを有効・無効にする
         /// </summary>
-        /// <param name="isEnabled">Indicates whether dragging should be enabled or disabled.</param>
+        /// <param name="isEnabled">ドラッグを有効にするか否か</param>
         public void SetDragging(bool isEnabled)
         {
             if (IsDraggingEnabled == isEnabled)
@@ -300,7 +302,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             StoppedDragging.RaiseEvent();
         }
 
-        /*
         public void OnFocusEnter()
         {
             if (!IsDraggingEnabled)
@@ -330,7 +331,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
             isGazed = false;
         }
-        */
 
         public void OnInputUp(InputEventData eventData)
         {
