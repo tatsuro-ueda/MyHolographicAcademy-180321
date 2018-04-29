@@ -13,7 +13,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
     /// and adds and updates the Magnet transforms of remote users.
     /// Magnet transforms are sent and received in the local coordinate space of the GameObject this component is on.
     /// </summary>
-    public class MySharable : MonoBehaviour
+    public class RemoteMagnetManager : MonoBehaviour
     {
         public class RemoteMagnetInfo
         {
@@ -45,6 +45,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void Start()
         {
+            DebugLogText = GameObject.Find("Debug Log").GetComponent<TextMesh>();
+            DebugLog2Text = GameObject.Find("Debug Log 2").GetComponent<TextMesh>();
+            SharingPrefabObject = GameObject.Find("Sharing");
+
             CustomMessagesMyHolographicAcademy.Instance.MessageHandlers
                 [CustomMessagesMyHolographicAcademy.TestMessageID.MagnetTransform] = UpdateMagnetTransform;
             //CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateMagnetTransform;
@@ -176,10 +180,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="user">User that joined the current session.</param>
         private void UserJoinedSession(User user)
         {
-            DebugLogText.text += "\n[Magnet] UserJoinedSession(User user) > user.GetID(): " + 
+            DebugLogText.text += "\n[Magnet] UserJoinedSession(User user) > user.GetID(): " +
                 user.GetID().ToString();
             DebugLogText.text += "\n[Magnet] UserJoinedSession(User user) > " +
-                "SharingStage.Instance.Manager.GetLocalUser().GetID(): " + 
+                "SharingStage.Instance.Manager.GetLocalUser().GetID(): " +
                 SharingStage.Instance.Manager.GetLocalUser().GetID().ToString();
             if (user.GetID() != SharingStage.Instance.Manager.GetLocalUser().GetID())
             {
@@ -275,4 +279,4 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         }
         */
     }
-    }
+}

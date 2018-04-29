@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+ï»¿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using UnityEngine;
@@ -7,49 +7,47 @@ using System;
 namespace HoloToolkit.Unity.InputModule
 {
     /// <summary>
-    /// HoloLensã‚ÌƒIƒuƒWƒFƒNƒg‚ğè‚Åƒhƒ‰ƒbƒO‚·‚é‚±‚Æ‚ª‚Å‚«‚é‚æ‚¤‚É‚·‚éƒRƒ“ƒ|[ƒlƒ“ƒg‚Å‚·B
-    /// Œ»İ‚Æ’¼‘O‚Ìè‚ÌˆÊ’u‚ÌŠp“x‚ÆzÀ•Wi‘OŒãj‚Ì•Ï‰»‚ğŒvZ‚µA
-    /// ‚»‚±‚ÉƒIƒuƒWƒFƒNƒg‚ğ”z’u‚·‚é‚±‚Æ‚ÅAƒhƒ‰ƒbƒO‚ğÀŒ»‚µ‚Ä‚¢‚Ü‚·B
+    /// HoloLensä¸Šã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ‰‹ã§ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹ã“ã¨ãŒã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã§ã™ã€‚
+    /// ç¾åœ¨ã¨ç›´å‰ã®æ‰‹ã®ä½ç½®ã®è§’åº¦ã¨zåº§æ¨™ï¼ˆå‰å¾Œï¼‰ã®å¤‰åŒ–ã‚’è¨ˆç®—ã—ã€
+    /// ãã“ã«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’é…ç½®ã™ã‚‹ã“ã¨ã§ã€ãƒ‰ãƒ©ãƒƒã‚°ã‚’å®Ÿç¾ã—ã¦ã„ã¾ã™ã€‚
     /// </summary>
-    public class MyHandDraggable : MonoBehaviour, IFocusable, IInputHandler, ISourceStateHandler
-    {        
+    public class MyHandDraggable3 : MonoBehaviour, IFocusable, IInputHandler, ISourceStateHandler
+    {
         /// <summary>
-        /// ƒhƒ‰ƒbƒO‚ªn‚Ü‚Á‚½‚Æ‚«‚Éˆø‚«‹N‚±‚³‚ê‚éƒCƒxƒ“ƒg
+        /// ãƒ‰ãƒ©ãƒƒã‚°ãŒå§‹ã¾ã£ãŸã¨ãã«å¼•ãèµ·ã“ã•ã‚Œã‚‹ã‚¤ãƒ™ãƒ³ãƒˆ
         /// </summary>
         public event Action StartedDragging;
 
         /// <summary>
-        /// ƒhƒ‰ƒbƒO‚ª~‚Ü‚Á‚½‚Æ‚«‚Éˆø‚«‹N‚±‚³‚ê‚éƒCƒxƒ“ƒg
+        /// ãƒ‰ãƒ©ãƒƒã‚°ãŒæ­¢ã¾ã£ãŸã¨ãã«å¼•ãèµ·ã“ã•ã‚Œã‚‹ã‚¤ãƒ™ãƒ³ãƒˆ
         /// </summary>
         public event Action StoppedDragging;
 
-        [Tooltip("ƒhƒ‰ƒbƒO‚³‚ê‚éTransformBƒfƒtƒHƒ‹ƒg‚Å‚ÍA‚±‚ÌƒRƒ“ƒ|[ƒlƒ“ƒg‚ğŠÜ‚ŞƒIƒuƒWƒFƒNƒg")]
+        [Tooltip("ãƒ‰ãƒ©ãƒƒã‚°ã•ã‚Œã‚‹Transformã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ã¯ã€ã“ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å«ã‚€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ")]
         public Transform HostTransform;
 
-        [Tooltip("z²‚É‰ˆ‚Á‚½è‚ÌˆÚ“®‚Ì‰½”{‚¾‚¯ƒhƒ‰ƒbƒO‚·‚éƒIƒuƒWƒFƒNƒg‚ğ“®‚©‚·‚©‚Ì”{—¦")]
+        [Tooltip("zè»¸ã«æ²¿ã£ãŸæ‰‹ã®ç§»å‹•ã®ä½•å€ã ã‘ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‹•ã‹ã™ã‹ã®å€ç‡")]
         public float DistanceScale = 2f;
 
         public enum RotationModeEnum
         {
             Default,
-            LockObjectRotation,  // RotationŒÅ’è
-            OrientTowardUser,  // ƒ†[ƒU‚Ì•û‚ğŒü‚­
+            LockObjectRotation,  // Rotationå›ºå®š
+            OrientTowardUser,  // ãƒ¦ãƒ¼ã‚¶ã®æ–¹ã‚’å‘ã
             OrientTowardUserAndKeepUpright
         }
 
         public RotationModeEnum RotationMode = RotationModeEnum.Default;
 
-        [Tooltip("ƒIƒuƒWƒFƒNƒg‚ª–Ú•WˆÊ’u‚Ü‚Å•âŠÔ‚³‚ê‚é‘¬‚³")]
+        [Tooltip("ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç›®æ¨™ä½ç½®ã¾ã§è£œé–“ã•ã‚Œã‚‹é€Ÿã•")]
         [Range(0.01f, 1.0f)]
         public float PositionLerpSpeed = 0.2f;
 
-        [Tooltip("ƒIƒuƒWƒFƒNƒg‚ª–Ú•WŠp“x‚Ü‚Å•âŠÔ‚³‚ê‚é‘¬‚³")]
+        [Tooltip("ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç›®æ¨™è§’åº¦ã¾ã§è£œé–“ã•ã‚Œã‚‹é€Ÿã•")]
         [Range(0.01f, 1.0f)]
         public float RotationLerpSpeed = 0.2f;
 
         public bool IsDraggingEnabled = true;
-
-        public long UserID;
 
         private bool isDragging;
         private bool isGazed;
@@ -58,12 +56,12 @@ namespace HoloToolkit.Unity.InputModule
         private float objRefDistance;
 
         /// <summary>
-        /// è‚ÆƒIƒuƒWƒFƒNƒg‚Ì‚ ‚¢‚¾‚ÌÅ‰‚Ì‰ñ“]‚Ì·•ª
+        /// æ‰‹ã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚ã„ã ã®æœ€åˆã®å›è»¢ã®å·®åˆ†
         /// </summary>
         private Quaternion gazeAngularOffset;
 
         /// <summary>
-        /// ‚Â‚©‚ñ‚¾‚Æ‚«‚ÌŠî“_‚Æè‚Æ‚Ì‚ ‚¢‚¾‚Ì‹——£
+        /// ã¤ã‹ã‚“ã ã¨ãã®åŸºç‚¹ã¨æ‰‹ã¨ã®ã‚ã„ã ã®è·é›¢
         /// </summary>
         private float handRefDistance;
 
@@ -84,9 +82,6 @@ namespace HoloToolkit.Unity.InputModule
             }
 
             hostRigidbody = HostTransform.GetComponent<Rigidbody>();
-
-            // ’Ç‰Á
-            InputManager.Instance.PushFallbackInputHandler(gameObject);
         }
 
         private void OnDestroy()
@@ -100,9 +95,6 @@ namespace HoloToolkit.Unity.InputModule
             {
                 OnFocusExit();
             }
-
-            // ’Ç‰Á
-            InputManager.Instance.PopFallbackInputHandler();
         }
 
         private void Update()
@@ -115,7 +107,7 @@ namespace HoloToolkit.Unity.InputModule
 
 
         /// <summary>
-        /// ƒIƒuƒWƒFƒNƒg‚Ìƒhƒ‰ƒbƒO‚ğŠJn‚·‚é
+        /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‰ãƒ©ãƒƒã‚°ã‚’é–‹å§‹ã™ã‚‹
         /// </summary>
         public void StartDragging(Vector3 initialDraggingPosition)
         {
@@ -129,14 +121,14 @@ namespace HoloToolkit.Unity.InputModule
                 return;
             }
 
-            // ƒ}ƒjƒsƒ…ƒŒ[ƒVƒ‡ƒ“‚Ì‚ ‚¢‚¾‚Ì‚·‚×‚Ä‚Ì“ü—Í‚ğæ“¾‚·‚é‚½‚ßA©g‚ğƒ‚[ƒ_ƒ‹“ü—Í‘ÎÛ‚É’Ç‰Á‚·‚é
+            // ãƒãƒ‹ãƒ”ãƒ¥ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚ã„ã ã®ã™ã¹ã¦ã®å…¥åŠ›ã‚’å–å¾—ã™ã‚‹ãŸã‚ã€è‡ªèº«ã‚’ãƒ¢ãƒ¼ãƒ€ãƒ«å…¥åŠ›å¯¾è±¡ã«è¿½åŠ ã™ã‚‹
             InputManager.Instance.PushModalInputHandler(gameObject);
 
             isDragging = true;
 
             Transform cameraTransform = CameraCache.Main.transform;
 
-            // è‚à‚µ‚­‚ÍƒRƒ“ƒgƒ[ƒ‰[‚ÌˆÊ’u‚ğæ“¾‚·‚é
+            // æ‰‹ã‚‚ã—ãã¯ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã®ä½ç½®ã‚’å–å¾—ã™ã‚‹
             Vector3 inputPosition = Vector3.zero;
 #if UNITY_2017_2_OR_NEWER
             InteractionSourceInfo sourceKind;
@@ -154,34 +146,34 @@ namespace HoloToolkit.Unity.InputModule
             currentInputSource.TryGetPointerPosition(currentInputSourceId, out inputPosition);
 #endif
 
-            // Šî“_‚ÌˆÊ’u‚ğæ“¾‚·‚é
+            // åŸºç‚¹ã®ä½ç½®ã‚’å–å¾—ã™ã‚‹
             Vector3 pivotPosition = GetHandPivotPosition(cameraTransform);
 
-            // ‚Â‚©‚ñ‚¾‚Æ‚«‚ÌŠî“_‚Æè‚Æ‚Ì‚ ‚¢‚¾‚Ì‹——£
+            // ã¤ã‹ã‚“ã ã¨ãã®åŸºç‚¹ã¨æ‰‹ã¨ã®ã‚ã„ã ã®è·é›¢
             handRefDistance = Vector3.Magnitude(inputPosition - pivotPosition);
 
-            // Šî“_‚ÆƒIƒuƒWƒFƒNƒg‚Ì‚ ‚¢‚¾‚Ì‹——£
+            // åŸºç‚¹ã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚ã„ã ã®è·é›¢
             objRefDistance = Vector3.Magnitude(initialDraggingPosition - pivotPosition);
 
             Vector3 objForward = HostTransform.forward;
             Vector3 objUp = HostTransform.up;
 
-            // ƒIƒuƒWƒFƒNƒg‚ª‚Â‚©‚Ü‚ê‚½êŠ‚ğ•Û‚·‚é
+            // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒã¤ã‹ã¾ã‚ŒãŸå ´æ‰€ã‚’ä¿æŒã™ã‚‹
             objRefGrabPoint = cameraTransform.transform.InverseTransformDirection(HostTransform.position - initialDraggingPosition);
 
             Vector3 objDirection = Vector3.Normalize(initialDraggingPosition - pivotPosition);
             Vector3 handDirection = Vector3.Normalize(inputPosition - pivotPosition);
 
-            objForward = cameraTransform.InverseTransformDirection(objForward);       // ƒJƒƒ‰‹óŠÔ‚Å‚Ì
-            objUp = cameraTransform.InverseTransformDirection(objUp);                 // ƒJƒƒ‰‹óŠÔ‚Å‚Ì
-            objDirection = cameraTransform.InverseTransformDirection(objDirection);   // ƒJƒƒ‰‹óŠÔ‚Å‚Ì
-            handDirection = cameraTransform.InverseTransformDirection(handDirection); // ƒJƒƒ‰‹óŠÔ‚Å‚Ì
+            objForward = cameraTransform.InverseTransformDirection(objForward);       // ã‚«ãƒ¡ãƒ©ç©ºé–“ã§ã®
+            objUp = cameraTransform.InverseTransformDirection(objUp);                 // ã‚«ãƒ¡ãƒ©ç©ºé–“ã§ã®
+            objDirection = cameraTransform.InverseTransformDirection(objDirection);   // ã‚«ãƒ¡ãƒ©ç©ºé–“ã§ã®
+            handDirection = cameraTransform.InverseTransformDirection(handDirection); // ã‚«ãƒ¡ãƒ©ç©ºé–“ã§ã®
 
             objRefForward = objForward;
             objRefUp = objUp;
 
-            // è‚ÆƒIƒuƒWƒFƒNƒg‚Ì‚ ‚¢‚¾‚ÌÅ‰‚Ì‰ñ“]‚Ì·•ª‚ğ•Û‚·‚é
-            // ‚±‚ê‚É‚æ‚èƒhƒ‰ƒbƒO’†‚É‚±‚ê‚ğl—¶‚Å‚«‚é
+            // æ‰‹ã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚ã„ã ã®æœ€åˆã®å›è»¢ã®å·®åˆ†ã‚’ä¿æŒã™ã‚‹
+            // ã“ã‚Œã«ã‚ˆã‚Šãƒ‰ãƒ©ãƒƒã‚°ä¸­ã«ã“ã‚Œã‚’è€ƒæ…®ã§ãã‚‹
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
             draggingPosition = initialDraggingPosition;
 
@@ -189,19 +181,19 @@ namespace HoloToolkit.Unity.InputModule
         }
 
         /// <summary>
-        /// Šî“_‚ÌˆÊ’uiñ‚ÌªŒ³•Ó‚èj‚ğæ“¾‚·‚é
+        /// åŸºç‚¹ã®ä½ç½®ï¼ˆé¦–ã®æ ¹å…ƒè¾ºã‚Šï¼‰ã‚’å–å¾—ã™ã‚‹
         /// </summary>
-        /// <returns>Šî“_‚ÌˆÊ’u</returns>
+        /// <returns>åŸºç‚¹ã®ä½ç½®</returns>
         private Vector3 GetHandPivotPosition(Transform cameraTransform)
         {
-            // ƒJƒƒ‰‚æ‚è‚àáŠ±‰º‚ÅŒã‚ë
+            // ã‚«ãƒ¡ãƒ©ã‚ˆã‚Šã‚‚è‹¥å¹²ä¸‹ã§å¾Œã‚
             return cameraTransform.position + new Vector3(0, -0.2f, 0) - cameraTransform.forward * 0.2f;
         }
 
         /// <summary>
-        /// ƒhƒ‰ƒbƒO‚ğ—LŒøE–³Œø‚É‚·‚é
+        /// ãƒ‰ãƒ©ãƒƒã‚°ã‚’æœ‰åŠ¹ãƒ»ç„¡åŠ¹ã«ã™ã‚‹
         /// </summary>
-        /// <param name="isEnabled">ƒhƒ‰ƒbƒO‚ğ—LŒø‚É‚·‚é‚©”Û‚©</param>
+        /// <param name="isEnabled">ãƒ‰ãƒ©ãƒƒã‚°ã‚’æœ‰åŠ¹ã«ã™ã‚‹ã‹å¦ã‹</param>
         public void SetDragging(bool isEnabled)
         {
             if (IsDraggingEnabled == isEnabled)
@@ -218,13 +210,13 @@ namespace HoloToolkit.Unity.InputModule
         }
 
         /// <summary>
-        /// ƒhƒ‰ƒbƒO‚³‚ê‚Ä‚¢‚éƒIƒuƒWƒFƒNƒg‚ÌˆÊ’u‚ğXV‚·‚é
+        /// ãƒ‰ãƒ©ãƒƒã‚°ã•ã‚Œã¦ã„ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½ç½®ã‚’æ›´æ–°ã™ã‚‹
         /// </summary>
         private void UpdateDragging()
         {
             Transform cameraTransform = CameraCache.Main.transform;
 
-            // è‚à‚µ‚­‚ÍƒRƒ“ƒgƒ[ƒ‰[‚ÌˆÊ’u‚ğæ“¾‚·‚é
+            // æ‰‹ã‚‚ã—ãã¯ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼ã®ä½ç½®ã‚’å–å¾—ã™ã‚‹
             Vector3 inputPosition = Vector3.zero;
 #if UNITY_2017_2_OR_NEWER
             InteractionSourceInfo sourceKind;
@@ -242,36 +234,36 @@ namespace HoloToolkit.Unity.InputModule
             currentInputSource.TryGetPointerPosition(currentInputSourceId, out inputPosition);
 #endif
 
-            // Šî“_‚ğ‚ÌˆÊ’u‚ğæ“¾‚·‚é
+            // åŸºç‚¹ã‚’ã®ä½ç½®ã‚’å–å¾—ã™ã‚‹
             Vector3 pivotPosition = GetHandPivotPosition(cameraTransform);
 
-            // --- V‚µ‚¢ˆÊ’u‚ğŒvZ‚·‚éA‚±‚±‚©‚ç ---
-            // V‚µ‚¢AŠî“_‚©‚çŒ©‚½è‚ÌˆÊ’u
+            // --- æ–°ã—ã„ä½ç½®ã‚’è¨ˆç®—ã™ã‚‹ã€ã“ã“ã‹ã‚‰ ---
+            // æ–°ã—ã„ã€åŸºç‚¹ã‹ã‚‰è¦‹ãŸæ‰‹ã®ä½ç½®
             Vector3 newHandDirection = Vector3.Normalize(inputPosition - pivotPosition);
 
-            // ƒJƒƒ‰‹óŠÔ‚Å‚Ìè‚Ì•ûŒü
+            // ã‚«ãƒ¡ãƒ©ç©ºé–“ã§ã®æ‰‹ã®æ–¹å‘
             newHandDirection = cameraTransform.InverseTransformDirection(newHandDirection);
 
-            // è‚ÆƒIƒuƒWƒFƒNƒg‚Ì‚ ‚¢‚¾‚ÌÅ‰‚Ì‰ñ“]‚Ì·•ª
+            // æ‰‹ã¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ã‚ã„ã ã®æœ€åˆã®å›è»¢ã®å·®åˆ†
             Vector3 targetDirection = Vector3.Normalize(gazeAngularOffset * newHandDirection);
 
-            // ¢ŠE‹óŠÔ‚É–ß‚·
+            // ä¸–ç•Œç©ºé–“ã«æˆ»ã™
             targetDirection = cameraTransform.TransformDirection(targetDirection);
 
             float currentHandDistance = Vector3.Magnitude(inputPosition - pivotPosition);
 
-            // Œ»İ‚ÌŠî“_‚Æè‚Æ‚Ì‚ ‚¢‚¾‚Ì‹——£^‚Â‚©‚ñ‚¾‚Æ‚«‚ÌŠî“_‚Æè‚Æ‚Ì‚ ‚¢‚¾‚Ì‹——£
-            // è‘O‚Å‚Â‚©‚Ş‚Ù‚Ç‘å‚«‚­‘OŒã‚É“®‚©‚·‚±‚Æ‚ª‚Å‚«‚é
+            // ç¾åœ¨ã®åŸºç‚¹ã¨æ‰‹ã¨ã®ã‚ã„ã ã®è·é›¢ï¼ã¤ã‹ã‚“ã ã¨ãã®åŸºç‚¹ã¨æ‰‹ã¨ã®ã‚ã„ã ã®è·é›¢
+            // æ‰‹å‰ã§ã¤ã‹ã‚€ã»ã©å¤§ããå‰å¾Œã«å‹•ã‹ã™ã“ã¨ãŒã§ãã‚‹
             float distanceRatio = currentHandDistance / handRefDistance;
 
-            // public•Ï”‚ÌDistanceScaleiz²‚É‰ˆ‚Á‚½è‚ÌˆÚ“®‚Ì‰½”{‚¾‚¯ƒhƒ‰ƒbƒO‚·‚éƒIƒuƒWƒFƒNƒg‚ğ“®‚©‚·‚©‚Ì”{—¦j‚ğ”½‰f‚³‚¹‚é
+            // publicå¤‰æ•°ã®DistanceScaleï¼ˆzè»¸ã«æ²¿ã£ãŸæ‰‹ã®ç§»å‹•ã®ä½•å€ã ã‘ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‹•ã‹ã™ã‹ã®å€ç‡ï¼‰ã‚’åæ˜ ã•ã›ã‚‹
             float distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * DistanceScale : 0;
             float targetDistance = objRefDistance + distanceOffset;
 
             draggingPosition = pivotPosition + (targetDirection * targetDistance);
-            // --- V‚µ‚¢ˆÊ’u‚ğŒvZ‚·‚éA‚±‚±‚Ü‚Å ---
+            // --- æ–°ã—ã„ä½ç½®ã‚’è¨ˆç®—ã™ã‚‹ã€ã“ã“ã¾ã§ ---
 
-            // --- V‚µ‚¢‰ñ“]‚ğŒvZ‚·‚éA‚±‚±‚©‚ç ---
+            // --- æ–°ã—ã„å›è»¢ã‚’è¨ˆç®—ã™ã‚‹ã€ã“ã“ã‹ã‚‰ ---
             if (RotationMode == RotationModeEnum.OrientTowardUser || RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright)
             {
                 draggingRotation = Quaternion.LookRotation(HostTransform.position - pivotPosition);
@@ -280,17 +272,17 @@ namespace HoloToolkit.Unity.InputModule
             {
                 draggingRotation = HostTransform.rotation;
             }
-            else // RotationModeEnum.Default ‚Ìê‡
+            else // RotationModeEnum.Default ã®å ´åˆ
             {
                 Vector3 objForward = cameraTransform.TransformDirection(objRefForward); // in world space
                 Vector3 objUp = cameraTransform.TransformDirection(objRefUp);           // in world space
                 draggingRotation = Quaternion.LookRotation(objForward, objUp);
             }
-            // --- V‚µ‚¢‰ñ“]‚ğŒvZ‚·‚éA‚±‚±‚Ü‚Å ---
+            // --- æ–°ã—ã„å›è»¢ã‚’è¨ˆç®—ã™ã‚‹ã€ã“ã“ã¾ã§ ---
 
-            // --- V‚µ‚¢ˆÊ’uE‰ñ“]‚ğ“K—p‚·‚éA‚±‚±‚©‚ç ---
+            // --- æ–°ã—ã„ä½ç½®ãƒ»å›è»¢ã‚’é©ç”¨ã™ã‚‹ã€ã“ã“ã‹ã‚‰ ---
             Vector3 newPosition = Vector3.Lerp(HostTransform.position, draggingPosition + cameraTransform.TransformDirection(objRefGrabPoint), PositionLerpSpeed);
-            // ÅI“I‚ÈˆÊ’u‚ğ“K—p‚·‚é
+            // æœ€çµ‚çš„ãªä½ç½®ã‚’é©ç”¨ã™ã‚‹
             if (hostRigidbody == null)
             {
                 HostTransform.position = newPosition;
@@ -300,7 +292,7 @@ namespace HoloToolkit.Unity.InputModule
                 hostRigidbody.MovePosition(newPosition);
             }
 
-            // ÅI“I‚È‰ñ“]‚ğ“K—p‚·‚é
+            // æœ€çµ‚çš„ãªå›è»¢ã‚’é©ç”¨ã™ã‚‹
             Quaternion newRotation = Quaternion.Lerp(HostTransform.rotation, draggingRotation, RotationLerpSpeed);
             if (hostRigidbody == null)
             {
@@ -316,11 +308,11 @@ namespace HoloToolkit.Unity.InputModule
                 Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);
                 HostTransform.rotation = upRotation * HostTransform.rotation;
             }
-            // --- V‚µ‚¢ˆÊ’uE‰ñ“]‚ğ“K—p‚·‚éA‚±‚±‚Ü‚Å ---
+            // --- æ–°ã—ã„ä½ç½®ãƒ»å›è»¢ã‚’é©ç”¨ã™ã‚‹ã€ã“ã“ã¾ã§ ---
         }
 
         /// <summary>
-        /// ƒIƒuƒWƒFƒNƒg‚Ìƒhƒ‰ƒbƒO‚ğ~‚ß‚é
+        /// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‰ãƒ©ãƒƒã‚°ã‚’æ­¢ã‚ã‚‹
         /// </summary>
         public void StopDragging()
         {
@@ -329,7 +321,7 @@ namespace HoloToolkit.Unity.InputModule
                 return;
             }
 
-            // ƒ‚[ƒ_ƒ‹“ü—Í‘ÎÛ‚©‚ç©g‚ğíœ‚·‚é
+            // ãƒ¢ãƒ¼ãƒ€ãƒ«å…¥åŠ›å¯¾è±¡ã‹ã‚‰è‡ªèº«ã‚’å‰Šé™¤ã™ã‚‹
             InputManager.Instance.PopModalInputHandler();
 
             isDragging = false;
@@ -373,7 +365,7 @@ namespace HoloToolkit.Unity.InputModule
             if (currentInputSource != null &&
                 eventData.SourceId == currentInputSourceId)
             {
-                eventData.Use(); // ƒCƒxƒ“ƒg‚ªg‚í‚ê‚½‚±‚Æ‚ğ‹L˜^‚µ‚ÄA‘¼‚Ìˆ—‚Éó‚¯æ‚ç‚ê‚é‚Ì‚ğ–h‚®
+                eventData.Use(); // ã‚¤ãƒ™ãƒ³ãƒˆãŒä½¿ã‚ã‚ŒãŸã“ã¨ã‚’è¨˜éŒ²ã—ã¦ã€ä»–ã®å‡¦ç†ã«å—ã‘å–ã‚‰ã‚Œã‚‹ã®ã‚’é˜²ã
 
                 StopDragging();
             }
@@ -383,7 +375,7 @@ namespace HoloToolkit.Unity.InputModule
         {
             if (isDragging)
             {
-                // ‚·‚Å‚Éƒhƒ‰ƒbƒO‚Ì“ü—Í‚ğó‚¯æ‚Á‚Äˆ—‚µ‚Ä‚¢‚é‚Ì‚ÅAV‚µ‚¢ƒhƒ‰ƒbƒO‘€ì‚ÍŠJn‚µ‚È‚¢
+                // ã™ã§ã«ãƒ‰ãƒ©ãƒƒã‚°ã®å…¥åŠ›ã‚’å—ã‘å–ã£ã¦å‡¦ç†ã—ã¦ã„ã‚‹ã®ã§ã€æ–°ã—ã„ãƒ‰ãƒ©ãƒƒã‚°æ“ä½œã¯é–‹å§‹ã—ãªã„
                 return;
             }
 
@@ -394,7 +386,7 @@ namespace HoloToolkit.Unity.InputModule
             {
                 if (!eventData.InputSource.SupportsInputInfo(eventData.SourceId, SupportedInputInfo.Position))
                 {
-                    // The input source must provide positional data for this script to be usable
+                    // å…¥åŠ›å…ƒã¯ã“ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«å¿…è¦ãªä½ç½®æƒ…å ±ã‚’æä¾›ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„
                     return;
                 }
             }
@@ -406,27 +398,24 @@ namespace HoloToolkit.Unity.InputModule
             }
 #endif
 
-            eventData.Use(); // Mark the event as used, so it doesn't fall through to other handlers.
+            // ã‚¤ãƒ™ãƒ³ãƒˆãŒä½¿ã‚ã‚ŒãŸã“ã¨ã‚’è¨˜éŒ²ã—ã¦ã€ä»–ã®å‡¦ç†ã«å—ã‘å–ã‚‰ã‚Œã‚‹ã®ã‚’é˜²ã
+            eventData.Use();
 
             currentInputSource = eventData.InputSource;
             currentInputSourceId = eventData.SourceId;
 
-            /* ƒRƒƒ“ƒgƒAƒEƒg
             FocusDetails? details = FocusManager.Instance.TryGetFocusDetails(eventData);
 
             Vector3 initialDraggingPosition = (details == null)
                 ? HostTransform.position
                 : details.Value.Point;
-            */
-            // ’Ç‰Á
-            Vector3 initialDraggingPosition = HostTransform.position;
 
             StartDragging(initialDraggingPosition);
         }
 
         public void OnSourceDetected(SourceStateEventData eventData)
         {
-            // Nothing to do
+            // ä½•ã‚‚ã—ãªã„
         }
 
         public void OnSourceLost(SourceStateEventData eventData)
