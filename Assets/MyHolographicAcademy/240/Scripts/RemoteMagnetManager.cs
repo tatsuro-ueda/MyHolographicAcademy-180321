@@ -48,10 +48,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void Start()
         {
-            DebugLogText = GameObject.Find("Debug Log").GetComponent<TextMesh>();
-            DebugLog2Text = GameObject.Find("Debug Log 2").GetComponent<TextMesh>();
-            SharingPrefabObject = GameObject.Find("Sharing");
-
             CustomMessagesMyHolographicAcademy.Instance.MessageHandlers
                 [CustomMessagesMyHolographicAcademy.TestMessageID.MagnetTransform] = UpdateMagnetTransform;
             //CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateMagnetTransform;

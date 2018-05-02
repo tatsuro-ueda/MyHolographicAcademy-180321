@@ -647,7 +647,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnablePrefabs:
-  - DataModelClassName: SyncSpawnMagnet
+  - DataModelClassName: SyncSpawnedMagnet
     Prefab: {fileID: 1711835248641868, guid: 96f9c87ba3500d141bd390b330cb4cda, type: 2}
 --- !u!1 &1540062350 stripped
 GameObject:
