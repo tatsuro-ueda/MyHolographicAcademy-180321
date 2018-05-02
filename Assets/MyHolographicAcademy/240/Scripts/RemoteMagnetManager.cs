@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using HoloToolkit.Sharing;
+using HoloToolkit.Unity;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
     /// and adds and updates the Magnet transforms of remote users.
     /// Magnet transforms are sent and received in the local coordinate space of the GameObject this component is on.
     /// </summary>
-    public class RemoteMagnetManager : MonoBehaviour
+    public class RemoteMagnetManager : Singleton<RemoteMagnetManager>
     {
         public class RemoteMagnetInfo
         {
@@ -34,10 +35,12 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         [Tooltip("Sharingプレハブをヒエラルキービューに入れたもの")]
         public GameObject SharingPrefabObject;
 
+        public bool hasSpawnedMagnet = false;
+
         /// <summary>
         /// Keep a list of the remote Magnets, indexed by XTools userID
         /// </summary>
-        private Dictionary<long, RemoteMagnetInfo> remoteMagnets = new Dictionary<long, RemoteMagnetInfo>();
+        public Dictionary<long, RemoteMagnetInfo> RemoteMagnets = new Dictionary<long, RemoteMagnetInfo>();
 
         private bool hasUpdatedbyRemote;
 
@@ -145,7 +148,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         {
         }
 
-        protected void OnDestroy()
+        protected override void OnDestroy()
         {
             if (SharingStage.Instance != null)
             {
@@ -202,7 +205,7 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             RemoteMagnetInfo MagnetInfo;
 
             // Get the Magnet info if its already in the list, otherwise add it
-            if (!remoteMagnets.TryGetValue(userId, out MagnetInfo))
+            if (!RemoteMagnets.TryGetValue(userId, out MagnetInfo))
             {
                 MagnetInfo = new RemoteMagnetInfo();
                 MagnetInfo.UserID = userId;
@@ -231,8 +234,12 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 // Parse the message
                 long userID = msg.ReadInt64();
 
-                transform.position = SharingPrefabObject.transform.TransformPoint(
-                CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
+                Vector3 magnetPosition = CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg);
+                Vector3 magnetDirection = 
+                    CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles;
+                RemoteMagnetInfo magnetInfo = GetRemoteMagnetInfo(userID);
+
+                magnetInfo.MagnetObject.transform.position = SharingPrefabObject.transform.TransformPoint(magnetPosition);
                 /*
                 transform.position = GameObject.Find("Sharing").transform.TransformPoint(
                     CustomMessagesMyHolographicAcademy.Instance.ReadVector3(msg));
@@ -241,8 +248,8 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 transform.rotation = Quaternion.Inverse(GameObject.Find("Sharing").transform.rotation) *
                     transform.rotation;
                 */
-                transform.rotation = Quaternion.Euler(SharingPrefabObject.transform.TransformDirection(
-                    CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));
+                magnetInfo.MagnetObject.transform.rotation = Quaternion.Euler(
+                    SharingPrefabObject.transform.TransformDirection(magnetDirection));
                 /*
                 transform.rotation = Quaternion.Euler(GameObject.Find("Sharing").transform.TransformDirection(
                     CustomMessagesMyHolographicAcademy.Instance.ReadQuaternion(msg).eulerAngles));

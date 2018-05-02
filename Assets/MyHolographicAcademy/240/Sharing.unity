@@ -247,6 +247,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bb7aa0135ecb7e47b44098b0b3ec8be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnManager: {fileID: 1498985653}
+  DebugLogText: {fileID: 1540062352}
 --- !u!4 &569036854
 Transform:
   m_ObjectHideFlags: 0
@@ -633,6 +635,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd226ec497ed15a449a7e106b3b7a6df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1498985653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1498985648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ea9b56756ce4549ac9331b03af784f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnablePrefabs:
+  - DataModelClassName: SyncSpawnMagnet
+    Prefab: {fileID: 1711835248641868, guid: 96f9c87ba3500d141bd390b330cb4cda, type: 2}
 --- !u!1 &1540062350 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1000013198843976, guid: bfdc7f60d7205c84f82a4806a5352d60,
