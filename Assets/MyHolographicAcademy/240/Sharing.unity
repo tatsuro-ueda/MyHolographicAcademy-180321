@@ -113,6 +113,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!102 &220740510 stripped
+TextMesh:
+  m_PrefabParentObject: {fileID: 102000010767390410, guid: bfdc7f60d7205c84f82a4806a5352d60,
+    type: 2}
+  m_PrefabInternal: {fileID: 466202779}
 --- !u!1001 &434824187
 Prefab:
   m_ObjectHideFlags: 0
@@ -460,6 +465,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 0.0005
       objectReference: {fileID: 0}
+    - target: {fileID: 1486700903388030, guid: fcd9102b24b198c439d17aee506c7496, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: fcd9102b24b198c439d17aee506c7496, type: 2}
   m_IsPrefabParent: 0
@@ -562,7 +571,7 @@ Prefab:
     - target: {fileID: 114000012667812730, guid: 8aaf37823b26ee449bb3b3d7775965c3,
         type: 2}
       propertyPath: ServerAddress
-      value: 169.254.82.181
+      value: 172.25.14.8
       objectReference: {fileID: 0}
     - target: {fileID: 114835164397381706, guid: 8aaf37823b26ee449bb3b3d7775965c3,
         type: 2}
@@ -578,6 +587,11 @@ Prefab:
         type: 2}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012667812730, guid: 8aaf37823b26ee449bb3b3d7775965c3,
+        type: 2}
+      propertyPath: KeepRoomAlive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8aaf37823b26ee449bb3b3d7775965c3, type: 2}
@@ -649,6 +663,21 @@ MonoBehaviour:
   spawnablePrefabs:
   - DataModelClassName: SyncSpawnedMagnet
     Prefab: {fileID: 1711835248641868, guid: 96f9c87ba3500d141bd390b330cb4cda, type: 2}
+--- !u!114 &1498985654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1498985648}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0abb60e886f69ae4e8da0d12b2a51135, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugLogText: {fileID: 1540062352}
+  DebugLog2Text: {fileID: 220740510}
+  SharingPrefabObject: {fileID: 1498985648}
+  hasSpawnedMagnet: 0
 --- !u!1 &1540062350 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1000013198843976, guid: bfdc7f60d7205c84f82a4806a5352d60,

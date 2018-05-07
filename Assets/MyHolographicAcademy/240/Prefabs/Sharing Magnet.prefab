@@ -22,12 +22,11 @@ GameObject:
   - component: {fileID: 33408072244148962}
   - component: {fileID: 65244973486891290}
   - component: {fileID: 23803904748886118}
-  - component: {fileID: 114330517085710418}
   - component: {fileID: 114096413257383202}
-  - component: {fileID: 114152292681673612}
+  - component: {fileID: 114601153968708836}
   m_Layer: 0
   m_Name: Sharing Magnet
-  m_TagString: Untagged
+  m_TagString: Magnet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,7 +115,7 @@ MonoBehaviour:
   RotationLerpSpeed: 0.2
   IsDraggingEnabled: 1
   UserID: 0
---- !u!114 &114152292681673612
+--- !u!114 &114601153968708836
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -124,22 +123,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1711835248641868}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e5bdbf5658081b48911c5c683c006eb, type: 3}
+  m_Script: {fileID: 11500000, guid: e1f08251a5e7bbf4db89e8e2807735f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   DebugLogText: {fileID: 0}
---- !u!114 &114330517085710418
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1711835248641868}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0abb60e886f69ae4e8da0d12b2a51135, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DebugLogText: {fileID: 0}
-  DebugLog2Text: {fileID: 0}
-  SharingPrefabObject: {fileID: 163528, guid: 8aaf37823b26ee449bb3b3d7775965c3, type: 2}
-  hasSpawnedMagnet: 0

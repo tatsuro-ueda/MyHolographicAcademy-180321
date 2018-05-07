@@ -48,8 +48,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
 
         private void Start()
         {
+            /*
             CustomMessagesMyHolographicAcademy.Instance.MessageHandlers
                 [CustomMessagesMyHolographicAcademy.TestMessageID.MagnetTransform] = UpdateMagnetTransform;
+            */
             //CustomMessages.Instance.MessageHandlers[CustomMessages.TestMessageID.HeadTransform] = UpdateMagnetTransform;
             DebugLogText.text += "\n[Magnet] Set UpdateMagnetTransform as MessageHandlers";
 
@@ -122,8 +124,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 Quaternion MagnetRotationFromSharingPrefabObject =
                     Quaternion.Euler(SharingPrefabObject.transform.InverseTransformDirection(
                         transform.eulerAngles));
+                /*
                 CustomMessagesMyHolographicAcademy.Instance.SendMagnetTransform(
                     MagnetPositionFromSharingPrefab, MagnetRotationFromSharingPrefabObject);
+                */
                 DebugLog2Text.text += "\nSendMagnetTransform > " +
                     "\nMagnetPositionFromSharingPrefab: " + MagnetPositionFromSharingPrefab.ToString();
             }

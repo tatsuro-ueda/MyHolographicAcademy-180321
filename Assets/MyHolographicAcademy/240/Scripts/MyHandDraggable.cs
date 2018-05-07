@@ -3,6 +3,7 @@
 
 using UnityEngine;
 using System;
+using HoloToolkit.Sharing;
 
 namespace HoloToolkit.Unity.InputModule
 {
@@ -86,7 +87,12 @@ namespace HoloToolkit.Unity.InputModule
             hostRigidbody = HostTransform.GetComponent<Rigidbody>();
 
             // ’Ç‰Á
-            InputManager.Instance.PushFallbackInputHandler(gameObject);
+            int ownerId = GetComponent<DefaultSyncModelAccessor>().SyncModel.OwnerId;
+            int userId = SharingStage.Instance.Manager.GetLocalUser().GetID();
+            if (ownerId == userId)
+            {
+                InputManager.Instance.PushFallbackInputHandler(gameObject);
+            }
         }
 
         private void OnDestroy()
