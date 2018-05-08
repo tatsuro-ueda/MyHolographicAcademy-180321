@@ -88,7 +88,9 @@ namespace HoloToolkit.Unity.InputModule
 
             // ’Ç‰Á
             int ownerId = GetComponent<DefaultSyncModelAccessor>().SyncModel.OwnerId;
+            Debug.Log("ownerId = " + ownerId);
             int userId = SharingStage.Instance.Manager.GetLocalUser().GetID();
+            Debug.Log("userId = " + userId);
             if (ownerId == userId)
             {
                 InputManager.Instance.PushFallbackInputHandler(gameObject);

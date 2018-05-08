@@ -2,8 +2,6 @@
 using HoloToolkit.Sharing.Spawning;
 using HoloToolkit.Sharing.Tests;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Education.FeelPhysics.MyHolographicAcademy
 {
@@ -165,6 +163,8 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                     if(syncSpawnObject.OwnerId ==
                         SharingStage.Instance.Manager.GetLocalUser().GetID())
                     {
+                        // 磁石のOnDestroyを走らせる
+                        Object.DestroyImmediate(magnet);
                         spawnManager.Delete(syncSpawnObject);
                     }
                 }
