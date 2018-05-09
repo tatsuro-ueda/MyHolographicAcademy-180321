@@ -66,32 +66,6 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         private void UserLeftSession(User user)
         {
             this.DebugLogText.text += "\n[MagnetSpawner] UserLeftSession(User user) > user.GetID(): " + user.GetID().ToString();
-            int userId = user.GetID();
-            /*
-            if (userId != SharingStage.Instance.Manager.GetLocalUser().GetID())
-            {
-                this.RemoveRemoteMagnet(RemoteMagnetManager.Instance.RemoteMagnets[userId].MagnetObject);
-                RemoteMagnetManager.Instance.RemoteMagnets.Remove(userId);
-            }
-            IEnumerable<SyncSpawnedObject> query = SharingStage.Instance.Root.InstantiatedPrefabs.Where(o => o.OwnerId == userId);
-            foreach (SyncSpawnedObject sso in query)
-            {
-                SharingStage.Instance.Root.InstantiatedPrefabs.RemoveObject(sso);
-            }
-            */
-            // 自分の磁石を削除する
-            /*
-            IEnumerable<SyncSpawnedObject> query = SharingStage.Instance.Root.InstantiatedPrefabs.Where(o => o.OwnerId == userId);
-            foreach (SyncSpawnedObject sso in query)
-            {
-                GameObject go = sso.GameObject;
-                Object.DestroyImmediate(go);
-                spawnManager.Delete(sso);
-                // 以下の行を有効にすると、UserLeftSessionしたきりになってしまう。なぜ？
-                // SharingStageに格納されるSyncRootの情報は、以下の行で正しく削除される
-                //SharingStage.Instance.Root.InstantiatedPrefabs.RemoveObject(sso);
-            }
-            */
 
             this.DeleteMyMagnets();
         }
@@ -109,9 +83,13 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 "SharingStage.Instance.Manager.GetLocalUser().GetID(): " +
                 SharingStage.Instance.Manager.GetLocalUser().GetID().ToString();
 
-            this.DeleteMyMagnets();
+            // 他のユーザが参加したときは磁石の更新は行わない
+            if (user.GetID() == this.userId)
+            {
+                this.DeleteMyMagnets();
 
-            this.CreateMagnet(this.userId);
+                this.CreateMagnet(this.userId);
+            }
         }
 
         /// <summary>
@@ -120,26 +98,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
         /// <param name="userId"></param>
         private void CreateMagnet(long userId)
         {
-            /*
-            RemoteMagnetManager.RemoteMagnetInfo magnetInfo;
-
-            if (!RemoteMagnetManager.Instance.RemoteMagnets.TryGetValue(userId, out magnetInfo))
-            {
-            */
             Vector3 position = new Vector3(0, 0, 1.5f);
-                Quaternion rotation = Quaternion.identity;
-                var spawnedObject = new SyncSpawnedMagnet();
-                this.spawnManager.Spawn(spawnedObject, position, rotation, null, "SpawnedMagnet", true);
-
-                /*
-                // 生成した磁石にuserIdを紐付ける
-                magnetInfo = new RemoteMagnetManager.RemoteMagnetInfo();
-                magnetInfo.UserID = userId;
-                magnetInfo.MagnetObject = GameObject.Find("SpawnedMagnet");
-
-                RemoteMagnetManager.Instance.RemoteMagnets.Add(userId, magnetInfo);
-                */
-            //}
+            Quaternion rotation = Quaternion.identity;
+            var spawnedObject = new SyncSpawnedMagnet();
+            this.spawnManager.Spawn(spawnedObject, position, rotation, null, "SpawnedMagnet", true);
         }
 
         /// <summary>
@@ -151,6 +113,10 @@ namespace Education.FeelPhysics.MyHolographicAcademy
             Object.DestroyImmediate(remoteMagnetObject);
         }
 
+        /// <summary>
+        /// セッション参加が複数回起きて自分が生成した磁石が複数になった場合のために、
+        /// 自分が生成した磁石をすべて削除する
+        /// </summary>
         private void DeleteMyMagnets()
         {
             var magnets = GameObject.FindGameObjectsWithTag("Magnet");
@@ -160,12 +126,13 @@ namespace Education.FeelPhysics.MyHolographicAcademy
                 if (syncModelAccessor != null)
                 {
                     var syncSpawnObject = (SyncSpawnedObject)syncModelAccessor.SyncModel;
-                    if(syncSpawnObject.OwnerId ==
+                    if (syncSpawnObject.OwnerId ==
                         SharingStage.Instance.Manager.GetLocalUser().GetID())
                     {
                         // 磁石のOnDestroyを走らせる
                         Object.DestroyImmediate(magnet);
-                        spawnManager.Delete(syncSpawnObject);
+
+                        this.spawnManager.Delete(syncSpawnObject);
                     }
                 }
             }
